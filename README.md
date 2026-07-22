@@ -1,131 +1,97 @@
-# 🎥 YouTube RAG Assistant
+# AXEL 🤖
 
-A Retrieval-Augmented Generation (RAG) application that allows users to chat with YouTube videos using AI.
+### A.X.E.L.
+**Advanced eXpert for Execution & Learning**
 
-The system extracts video transcripts, converts them into embeddings, stores them in ChromaDB, retrieves relevant content using semantic search, and generates context-aware responses using Llama3.
+AXEL is a modular AI assistant designed to understand, retrieve, and reason over information from multiple knowledge sources. It combines Retrieval-Augmented Generation (RAG), Large Language Models (LLMs), and modern backend technologies to provide intelligent, context-aware responses.
 
 ---
 
-## 🚀 Features
+## ✨ Features
 
-* Extracts transcripts directly from YouTube videos
-* Supports Hindi and English transcripts
-* Splits transcripts into manageable chunks
-* Generates embeddings using Sentence Transformers
-* Stores embeddings in ChromaDB
-* Performs semantic search for relevant context retrieval
-* Uses Llama3 via Ollama for answer generation
-* Provides context-aware responses from video content
-* Suggests follow-up questions related to the topic
+- 🎥 Chat with YouTube Videos
+- 📄 Chat with PDF Documents
+- 🌐 Chat with Websites *(Coming Soon)*
+- 💻 Chat with GitHub Repositories *(Coming Soon)*
+- 🧠 Context-Aware Memory *(Coming Soon)*
+- 🤖 General AI Chat
+- 🔍 Retrieval-Augmented Generation (RAG)
+- ⚡ FastAPI Backend
+- 🗂️ ChromaDB Vector Database
+- 🔗 LangChain Integration
+- 🦙 Ollama Local LLM Support
 
 ---
 
 ## 🛠️ Tech Stack
 
-* Python
-* Ollama
-* Llama3
-* ChromaDB
-* Sentence Transformers
-* YouTube Transcript API
+- Python
+- FastAPI
+- LangChain
+- ChromaDB
+- Sentence Transformers
+- Ollama
+- React *(Planned)*
 
 ---
 
-## 🧠 RAG Pipeline
+## 📂 Project Architecture
 
-```text
-YouTube URL
-      ↓
-Transcript Extraction
-      ↓
-Chunking
-      ↓
-Embeddings
-      ↓
-ChromaDB
-      ↓
-Semantic Retrieval
-      ↓
-Context Building
-      ↓
-Llama3
-      ↓
-AI Response
+```
+AXEL
+│
+├── backend
+│   ├── loaders
+│   ├── database
+│   ├── services
+│   ├── models
+│   ├── utils
+│   └── main.py
+│
+├── frontend (Planned)
+│
+└── README.md
 ```
 
 ---
 
-## 📦 Installation
+## 🎯 Vision
 
-Clone the repository:
+AXEL is not just another chatbot.
 
-```bash
-git clone <your-repository-url>
-cd YoutubeRAG
-```
+The goal is to build a modular AI platform capable of understanding information from multiple sources such as YouTube videos, PDF documents, websites, GitHub repositories, and future integrations—all through a single intelligent interface.
 
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Make sure Ollama is installed and Llama3 is available:
-
-```bash
-ollama pull llama3
-```
-
-Run the application:
-
-```bash
-python app.py
-```
+Every new capability is added as a module, making AXEL scalable, maintainable, and easy to extend.
 
 ---
 
-## 💬 Example Usage
+## 🚀 Roadmap
 
-```text
-Enter Youtube Url :
-https://www.youtube.com/watch?v=VIDEO_ID
+### ✅ Phase 1
+- FastAPI Backend
+- YouTube RAG
+- Modular Architecture
 
-You : What project was built in this video?
+### 🚧 Phase 2
+- PDF RAG
 
-AI : The video demonstrates building a React application...
-```
+### 🚧 Phase 3
+- Website RAG
 
----
+### 🚧 Phase 4
+- GitHub Repository Chat
 
-## 📚 What I Learned
+### 🚧 Phase 5
+- Conversation Memory
 
-* Retrieval-Augmented Generation (RAG)
-* Text Chunking Strategies
-* Embedding Generation
-* Vector Databases
-* Semantic Search
-* Context Augmentation
-* LLM Integration with Ollama
-* End-to-End RAG Pipeline Development
+### 🚧 Phase 6
+- Multi-Agent Support
 
----
-
-## 🔮 Future Improvements
-
-* Streamlit Web Interface
-* Source Citations
-* Multi-Video Knowledge Base
-* LangChain Integration
-* LangGraph Workflows
-* Agentic AI Features
+### 🚧 Phase 7
+- React Frontend
 
 ---
 
-## 👨‍💻 Author
+## 📜 License
 
-Saarthak Pandey
-
-GitHub: https://github.com/saarthakpandey03
-LinkedIn: https://www.linkedin.com/in/saarthak-pandey-a24118330/
-Portfolio: https://saarthakpandey.netlify.app/
-# VideoMind-AI
+MIT License
