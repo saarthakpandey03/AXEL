@@ -1,39 +1,65 @@
-# Active Collection
-active_collection = None
+from backend.storage.redis import redis_client
+import json
 
-# Loaded Collections
-loaded_collections = set()
+def set_active_collection(session_id: str, collection: str):
+
+    redis_client.hset(
+        session_id,
+        "active_collection",
+        collection
+    )
+
+def get_active_collection(session_id: str):
+
+    collection = redis_client.hget(
+        session_id,
+        "active_collection"
+    )
+    return collection
+
+def add_loaded_collection(session_id: str, collection: str):
+
+    collections = get_loaded_collections(session_id)
+
+    collections.append(collection)
+
+    collections = list(set(collections))
+
+    redis_client.hset(
+        f"session:{session_id}",
+        "loaded_collections",
+        json.dumps(collections)
+    )
+
+def get_loaded_collections(session_id: str):
+
+    collections = redis_client.hget(
+        f"session:{session_id}",
+        "loaded_collections"
+    )
+    if collections is None:
+        return []
+    return json.loads(collections)
 
 
-def set_active_collection(collection_name: str):
-    """
-    Set the currently active knowledge source.
-    """
-    global active_collection
-    active_collection = collection_name
+def set_history(session_id: str, history):
+    
+    redis_client.hset(
+        session_id,
+        "history",
+        json.dumps(history)
+    )
 
-    loaded_collections.add(collection_name)
+def get_history(session_id: str):
 
+    history = redis_client.hget(
+        session_id,
+        "history"
+    )
+    if history is None:
+        return []
+    return json.loads(history)
 
-def get_active_collection():
-    """
-    Returns currently active collection.
-    """
-    return active_collection
-
-
-def get_loaded_collections():
-    """
-    Returns all loaded collections.
-    """
-    return list(loaded_collections)
-
-
-def clear_loaded_collections():
-    """
-    Clears all loaded collections.
-    """
-    global active_collection
-
-    active_collection = None
-    loaded_collections.clear()
+def clear_session(session_id: str):
+    redis_client.delete(session_id)
+    

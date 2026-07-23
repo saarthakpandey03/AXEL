@@ -1,5 +1,79 @@
-youtube-transcript-api==1.1.1
-sentence-transformers==5.1.1
-chromadb==1.1.1
-ollama==0.6.0
-pypdf==6.0.0
+# ===========================
+# FastAPI
+# ===========================
+fastapi
+uvicorn[standard]
+python-multipart
+
+# ===========================
+# LangChain
+# ===========================
+langchain
+langchain-core
+langchain-community
+langchain-ollama
+
+# ===========================
+# Embeddings
+# ===========================
+sentence-transformers
+torch
+transformers
+accelerate
+
+# ===========================
+# Vector Database
+# ===========================
+chromadb
+
+# ===========================
+# Redis
+# ===========================
+redis
+
+# ===========================
+# Document Loaders
+# ===========================
+pypdf
+python-docx
+python-pptx
+openpyxl
+pandas
+markdown
+beautifulsoup4
+lxml
+
+# ===========================
+# Website
+# ===========================
+requests
+
+# ===========================
+# YouTube
+# ===========================
+youtube-transcript-api
+yt-dlp
+
+# ===========================
+# GitHub
+# ===========================
+GitPython
+
+# ===========================
+# OCR & Vision
+# ===========================
+opencv-python
+easyocr
+pillow
+pytesseract
+
+# ===========================
+# Environment
+# ===========================
+python-dotenv
+
+# ===========================
+# Utilities
+# ===========================
+numpy
+tqdm

@@ -6,14 +6,14 @@ from backend.core.session import get_active_collection
 from backend.services.ingest import (
     ingest_youtube,
     ingest_website,
-    ingest_pdf,
     ingest_github,
     ingest_image,
-    ingest_document
+    ingest_document,
+    ingest_folder
 )
 
 
-def process_message(message: str):
+def process_message(session_id:str,message: str):
     """
     Main Brain of AXEL
 
@@ -27,22 +27,23 @@ def process_message(message: str):
     # -----------------------------
 
     if input_type == "youtube":
-        return ingest_youtube(message)
+        return ingest_youtube(session_id, message)
 
     elif input_type == "website":
-        return ingest_website(message)
+        return ingest_website(session_id, message)
 
     elif input_type == "github":
-        return ingest_github(message)
-
-    elif input_type == "pdf":
-        return ingest_pdf(message)
+        return ingest_github(session_id, message)
 
     elif input_type == "image":
-        return ingest_image(message)
+        return ingest_image(session_id, message)
 
     elif input_type == "document":
-        return ingest_document(message)
+        return ingest_document(session_id, message)
+    
+    elif input_type == "folder":
+        return ingest_folder(session_id, message)
+    
 
     # -----------------------------
     # Conversation
@@ -50,26 +51,22 @@ def process_message(message: str):
 
     elif input_type == "chat":
 
-        active_collection = get_active_collection()
+        answer = ask_question(
+            session_id=session_id,
+            question=message
+        )
 
-        # No Knowledge Loaded
-        if active_collection is None:
-            return {
-                "status": "success",
-                "mode": "chat",
-                "answer": chat(message)
-            }
+        if answer == "No Knowledge Source loaded":
 
-        # Knowledge Available
+            answer = chat(
+                session_id=session_id,
+                question=message
+            )
+
         return {
             "status": "success",
-            "mode": "rag",
-            "answer": ask_question(message)
+            "answer": answer
         }
-
-    # -----------------------------
-    # Unknown
-    # -----------------------------
 
     return {
         "status": "error",

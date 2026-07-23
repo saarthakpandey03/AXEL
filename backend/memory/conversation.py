@@ -1,47 +1,67 @@
+from backend.core.session import (
+    get_history,
+    set_history
+)
 
 
-conversation_history = []
-
-def add_message(role: str, content: str):
+def add_message(
+    session_id: str,
+    role: str,
+    content: str
+):
     """
-    Add a message to conversation history.
-
-    role:
-        user
-        assistant
+    Add a message to the current session history.
     """
 
-    conversation_history.append(
+    history = get_history(session_id)
+
+    history.append(
         {
-            "role":role,
-            "content":content
+            "role": role,
+            "content": content
         }
     )
 
-def get_history():
-    """
-    Return Full conversation history
-    """
-    return conversation_history
+    # Keep only last 20 messages
+    history = history[-20:]
 
-def clear_history():
-    """
-    Clear current conversation
-    """
-    conversation_history.clear()
+    set_history(
+        session_id,
+        history
+    )
 
-def build_context(limit=None):
 
+def clear_history(session_id: str):
+    """
+    Clear conversation history for a session.
+    """
+
+    set_history(
+        session_id,
+        []
+    )
+
+
+def build_context(
+    session_id: str,
+    limit: int = None
+):
     """
     Convert conversation history into prompt text.
     """
 
-    history = ""
+    history = get_history(session_id)
 
-    for message in conversation_history:
-        history += (
-            f"{message['role'].capitalize()}:"
+    if limit:
+        history = history[-limit:]
+
+    context = ""
+
+    for message in history:
+
+        context += (
+            f"{message['role'].capitalize()}: "
             f"{message['content']}\n"
         )
 
-    return history
+    return context.strip()

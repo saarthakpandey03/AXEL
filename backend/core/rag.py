@@ -5,7 +5,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 from backend.database.vectorDB import create_vector_db,search_all
 from backend.services.chunking import create_chunks
-from backend.core.session import get_active_collection
+from backend.core.session import get_loaded_collections
 
 from backend.memory.conversation import (
     add_message,
@@ -46,7 +46,7 @@ parser = StrOutputParser()
 chain = prompt | llm | parser
 
 
-def index_document(text: str,collection_name: str):
+def index_document(text: str,collection_name: str,session_id: str):
     """
     Converts any text into a searchable knowledge base.
 
@@ -62,23 +62,29 @@ def index_document(text: str,collection_name: str):
     create_vector_db(
         chunks=chunks,
         model=embedding_model,
-        collection_name=collection_name
+        collection_name=collection_name,
+        session_id=session_id
     )
 
 
-def ask_question(question: str):
+def ask_question(session_id:str, question: str):
 
-    collection_name = get_active_collection()
+    loaded_collections = get_loaded_collections(session_id)
 
-    history = build_context()
+    history = build_context(session_id)
 
-    if collection_name is None:
+    if not loaded_collections:
         return "No Knowledge Source loaded"
         
     context = search_all(
         query=question,
-        model=embedding_model
+        model=embedding_model,
+        collections = loaded_collections,
+        session_id=session_id
     )
+
+    if not context:
+        return "I don't know."
     
     response = chain.invoke(
         {
@@ -88,8 +94,8 @@ def ask_question(question: str):
         }
     )
 
-    add_message("user",question)
-    add_message("assistant",response)
+    add_message(session_id,"user",question)
+    add_message(session_id,"assistant",response)
 
     return response
 

@@ -41,26 +41,34 @@ def detect_input_type(user_input: str):
             return "website"
 
     # Local File Detection
+    # Local File Detection
     _, extension = os.path.splitext(user_input.lower())
 
-    if extension == ".pdf":
-        return "pdf"
+    if extension in [
+        ".pdf",
+        ".docx",
+        ".pptx",
+        ".xlsx",
+        ".xls",
+        ".csv",
+        ".txt",
+        ".md"
+    ]:
+        return "document"
 
     elif extension in [
         ".png",
         ".jpg",
         ".jpeg",
         ".webp",
-        ".gif"
+        ".gif",
+        ".bmp",
+        ".tiff",
+        ".tif"
     ]:
         return "image"
 
-    elif extension in [
-        ".txt",
-        ".md",
-        ".docx"
-    ]:
-        return "document"
+    elif os.path.isdir(user_input):
+        return "folder"
 
-    # Default
     return "chat"

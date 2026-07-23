@@ -12,7 +12,8 @@ llm = OllamaLLM(model="llama3")
 prompt = ChatPromptTemplate.from_template("""
 You are AXEL, an intelligent AI assistant.
 
-Use the previous conversation if it helps answer the current question.
+Use the previous conversation only when it is relevant.
+If the current question is unrelated, answer it independently.
 
 Conversation History:
 {history}
@@ -27,17 +28,17 @@ parser = StrOutputParser()
 
 chain = prompt | llm | parser
 
-def chat(question: str):
-    print("✅ chat.py called")
+def chat(session_id: str, question: str):
+    
 
-    history = build_context(limit=10)
+    history = build_context(session_id, limit=10)
     response = chain.invoke(
         {
             "history": history,
             "question": question
         }
     )
-    add_message("user",question)
-    add_message("assistant",response)
+    add_message(session_id, "user", question)
+    add_message(session_id, "assistant", response)
 
     return response
