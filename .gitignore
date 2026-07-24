@@ -6,3 +6,11 @@ __pycache__/
 myDB/
 backend/database/mydb/
 __pycache__/
+# Node
+node_modules/
+dist/
+# Uploads
+backend/uploads/
+
+# Chroma DB
+chroma_db/
