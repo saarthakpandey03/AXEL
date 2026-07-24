@@ -1,97 +1,276 @@
-# AXEL 🤖
+# 🚀 AXEL – AI Workspace
 
-### A.X.E.L.
-**Advanced eXpert for Execution & Learning**
+AXEL is a next-generation AI workspace that allows users to interact with multiple knowledge sources using local LLMs. Instead of being just another chatbot, AXEL acts as a unified AI assistant capable of understanding documents, websites, GitHub repositories, YouTube videos, images, and more.
 
-AXEL is a modular AI assistant designed to understand, retrieve, and reason over information from multiple knowledge sources. It combines Retrieval-Augmented Generation (RAG), Large Language Models (LLMs), and modern backend technologies to provide intelligent, context-aware responses.
+Built with **FastAPI**, **Ollama**, **LangChain**, **ChromaDB**, **Redis**, and a modern **React** frontend.
 
 ---
 
 ## ✨ Features
 
-- 🎥 Chat with YouTube Videos
-- 📄 Chat with PDF Documents
-- 🌐 Chat with Websites *(Coming Soon)*
-- 💻 Chat with GitHub Repositories *(Coming Soon)*
-- 🧠 Context-Aware Memory *(Coming Soon)*
-- 🤖 General AI Chat
-- 🔍 Retrieval-Augmented Generation (RAG)
-- ⚡ FastAPI Backend
-- 🗂️ ChromaDB Vector Database
-- 🔗 LangChain Integration
-- 🦙 Ollama Local LLM Support
+### 🤖 AI Chat
+- General AI Chat (Llama 3)
+- Context-aware conversations
+- Session-based memory
+- Multi-turn conversations
+
+### 📚 Retrieval-Augmented Generation (RAG)
+- PDF Support
+- DOCX Support
+- PPTX Support
+- TXT / Markdown
+- CSV / Excel
+- Website Indexing
+- GitHub Repository Indexing
+- YouTube Transcript Indexing
+- Folder Indexing
+- Multi-document Search
+
+### 🖼 Vision
+- Image Captioning (LLaVA)
+- OCR Text Extraction
+- Image Understanding
+
+### ⚡ Backend
+- FastAPI REST API
+- ChromaDB Vector Database
+- Sentence Transformers
+- Redis Session Management
+- LangChain Pipelines
+- Ollama Local LLM Integration
+
+### 💻 Frontend (In Progress)
+- Modern AI Workspace UI
+- Interactive Landing Page
+- Animated Particle Blob
+- Chat Interface
+- Drag & Drop Upload
+- Session History
 
 ---
 
-## 🛠️ Tech Stack
+# 🏗 Tech Stack
 
-- Python
+## Backend
+
 - FastAPI
 - LangChain
-- ChromaDB
-- Sentence Transformers
 - Ollama
-- React *(Planned)*
+- ChromaDB
+- Redis
+- Sentence Transformers
+- OpenCV
+- EasyOCR
+- PyPDF
+- Python
+
+## Frontend
+
+- React
+- Vite
+- Tailwind CSS
+- Framer Motion
+- React Three Fiber
+- Drei
 
 ---
 
-## 📂 Project Architecture
+# 📁 Project Structure
 
 ```
-AXEL
+AXEL/
 │
-├── backend
-│   ├── loaders
-│   ├── database
-│   ├── services
-│   ├── models
-│   ├── utils
+├── backend/
+│   ├── core/
+│   ├── database/
+│   ├── loaders/
+│   ├── memory/
+│   ├── models/
+│   ├── parsers/
+│   ├── services/
+│   ├── storage/
+│   ├── vision/
 │   └── main.py
 │
-├── frontend (Planned)
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   └── package.json
 │
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## 🎯 Vision
+# 🚀 Getting Started
 
-AXEL is not just another chatbot.
+## Clone Repository
 
-The goal is to build a modular AI platform capable of understanding information from multiple sources such as YouTube videos, PDF documents, websites, GitHub repositories, and future integrations—all through a single intelligent interface.
-
-Every new capability is added as a module, making AXEL scalable, maintainable, and easy to extend.
+```bash
+git clone https://github.com/yourusername/AXEL.git
+cd AXEL
+```
 
 ---
 
-## 🚀 Roadmap
+## Backend Setup
 
-### ✅ Phase 1
+Create Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+Activate
+
+### macOS / Linux
+
+```bash
+source .venv/bin/activate
+```
+
+### Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Install Ollama
+
+Install Ollama from:
+
+https://ollama.com
+
+Pull required models
+
+```bash
+ollama pull llama3
+ollama pull llava
+```
+
+---
+
+## Start Redis
+
+```bash
+redis-server
+```
+
+---
+
+## Run Backend
+
+```bash
+uvicorn backend.main:app --reload
+```
+
+API
+
+```
+http://localhost:8000
+```
+
+Swagger
+
+```
+http://localhost:8000/docs
+```
+
+---
+
+## Frontend Setup
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
+
+---
+
+# 📌 API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| POST /message | Chat with AXEL |
+| POST /upload | Upload Documents / Images |
+| GET / | Health Check |
+
+---
+
+# 🛣 Roadmap
+
+## ✅ Completed
+
 - FastAPI Backend
-- YouTube RAG
-- Modular Architecture
-
-### 🚧 Phase 2
-- PDF RAG
-
-### 🚧 Phase 3
-- Website RAG
-
-### 🚧 Phase 4
-- GitHub Repository Chat
-
-### 🚧 Phase 5
-- Conversation Memory
-
-### 🚧 Phase 6
-- Multi-Agent Support
-
-### 🚧 Phase 7
-- React Frontend
+- Local LLM Integration
+- ChromaDB
+- Redis Sessions
+- Multi-source RAG
+- Image Understanding
+- OCR
+- Multi-document Retrieval
 
 ---
 
-## 📜 License
+## 🚧 In Progress
+
+- React Frontend
+- Interactive Landing Page
+- Animated AI Blob
+- Workspace UI
+- Streaming Responses
+
+---
+
+## 🔮 Planned
+
+- Voice Assistant
+- Whisper Integration
+- Image Generation
+- AI Agents
+- SQL Agent
+- Code Interpreter
+- Web Search
+- Authentication
+- Docker Deployment
+- Cloud Deployment
+
+---
+
+# 📸 Screenshots
+
+Coming Soon
+
+---
+
+# 🤝 Contributing
+
+Contributions, feature requests, and suggestions are welcome.
+
+Feel free to open issues or submit pull requests.
+
+---
+
+# 📄 License
 
 MIT License
+
+---
+
+# 👨‍💻 Author
+
+**Saarthak Pandey**
+
+Building **AXEL** — an AI Workspace designed to become your second brain.
