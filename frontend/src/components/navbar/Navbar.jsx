@@ -1,4 +1,5 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight} from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -46,15 +47,17 @@ const Navbar = () => {
 
           {/* Login */}
 
+          <Link to="/SignIn" >
           <button
             className="flex items-center gap-2 rounded-full bg-black px-6
               py-3 text-white transition-all duration-300 hover:bg-blue-600
               hover:scale-105" >
-            Login
+            Log-in / SignUp
 
             <ArrowRight size={18} />
 
           </button>
+          </Link>
 
         </nav>
 

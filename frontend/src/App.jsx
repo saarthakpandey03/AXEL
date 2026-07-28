@@ -1,24 +1,29 @@
-import Navbar from "./components/navbar/Navbar";
-import Hero from "./components/landing/Hero";
-import Features from "./components/features/Features";
-import Workflow from "./components/workflow/Workflow";
-import Comparison from "./components/comparison/Comparison";
-import LiveDemo from "./components/demo/LiveDemo";
-import CTA from "./components/landing/CTA";
-import Footer from "./components/landing/Footer";
+import { Routes, Route } from "react-router-dom";
+
+import Landing from "./pages/Landing";
+import Login from "./pages/SignIn";
+import Signup from "./pages/SignUp";
 
 function App() {
   return (
-    <>
-      <Navbar />
-      <Hero />
-      <Features/>
-      <Workflow/>
-      <Comparison/>
-      <LiveDemo />
-      <CTA />
-      <Footer/>
-    </>
+    <Routes>
+
+      <Route
+        path="/"
+        element={<Landing />}
+      />
+
+      <Route
+        path="/signin"
+        element={<Login />}
+      />
+
+      <Route
+        path="/signup"
+        element={<Signup />}
+      />
+
+    </Routes>
   );
 }
 

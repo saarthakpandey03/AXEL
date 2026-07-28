@@ -1,27 +1,42 @@
 import { Canvas } from "@react-three/fiber";
 import BlobParticles from "./BlobParticles";
 
-export default function ParticleBlob() {
+const ParticleBlob = ({
+  className = "",
+  cameraZ = 7,
+  fov = 42,
+}) => {
   return (
-    <div className="w-full h-[700px] overflow-visible">
-        <Canvas
-        camera={{
-            position: [0, 0, 10],
-            fov: 35,
+    <div className={`h-full w-full ${className}`}>
+      <Canvas
+        className="!h-full !w-full"
+        gl={{
+          antialias: true,
+          alpha: true,
         }}
-        gl={{ alpha: true }}
-        >
-        
+        camera={{
+          position: [0, 0, cameraZ],
+          fov,
+        }}
+      >
+        <ambientLight intensity={0.35} />
 
-        <ambientLight intensity={0.25} />
         <pointLight
-            position={[4, 4, 5]}
-            intensity={6}
-            color="#4F8CFF"
+          position={[4, 4, 5]}
+          intensity={5}
+          color="#3b82f6"
+        />
+
+        <pointLight
+          position={[-4, -3, 4]}
+          intensity={2}
+          color="#06b6d4"
         />
 
         <BlobParticles />
-        </Canvas>
+      </Canvas>
     </div>
   );
-}
+};
+
+export default ParticleBlob;

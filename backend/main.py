@@ -2,9 +2,9 @@ from fastapi import FastAPI, UploadFile, File, Header,Depends
 import uuid
 import os
 from backend.core.dependencies import get_session_id
-from backend.models import MessageRequest
+from backend.schemas.chat import MessageRequest
 from backend.core.router import process_message
-
+from backend.auth.router import router as auth_router
 
 app = FastAPI(
     title="AXEL",
@@ -92,3 +92,6 @@ async def upload(
     response["session_id"] = session_id
 
     return response
+
+
+app.include_router(auth_router)
