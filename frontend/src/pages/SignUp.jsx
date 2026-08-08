@@ -5,7 +5,7 @@ import SignUpForm from '../components/auth/SignUpForm'
 const SignUp = () => {
   return (
     <div>
-        <div className="absolute top-4 left-10 z-20">
+        <div className="absolute top-4 left-10 z-20 hidden lg:flex lg:flex-col">
 
         <h1 className="text-5xl font-black tracking-tight text-slate-900">
           AXEL

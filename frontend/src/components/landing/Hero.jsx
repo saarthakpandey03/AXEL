@@ -1,6 +1,20 @@
 import ParticleBlob from "./ParticleBlob";
+import { useNavigate } from "react-router-dom";
+
 
 const Hero = () => {
+const navigate = useNavigate()
+
+const handleStartChat = ()=>{
+  const token = localStorage.getItem("token");
+
+  if(token){
+    navigate("/workspace")
+  }
+  else{
+    navigate("/SignIn")
+  } 
+}
   return (
     <section className="w-full mt-18">
       <div className="max-w-7xl mx-auto px-8 lg:px-12 py-6 lg:py-10">
@@ -22,7 +36,7 @@ const Hero = () => {
               AXEL is your AI workspace for understanding documents, websites, GitHub repositories, images, YouTube videos, folders and more — all in one intelligent conversation.
             </p>
             <div className="flex flex-wrap gap-5 mt-10">
-              <button className="px-8 py-4 rounded-full bg-gray-900 text-white font-medium transition-all duration-300 hover:bg-blue-600 hover:scale-105 shadow-lg">
+              <button onClick={handleStartChat} className="px-8 py-4 rounded-full bg-gray-900 text-white font-medium transition-all duration-300 hover:bg-blue-600 hover:scale-105 shadow-lg">
                 Start Chat
               </button>
               <button className="px-8 py-4 rounded-full border border-gray-300 bg-white text-gray-900 font-medium transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-md">

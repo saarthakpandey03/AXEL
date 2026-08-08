@@ -5,6 +5,10 @@ from backend.schemas.auth import (
     SigninRequest,
     AuthResponse
 )
+from backend.auth.service import (
+    signup_user,
+    signin_user
+    )
 
 router = APIRouter(
     prefix="/auth",
@@ -12,8 +16,10 @@ router = APIRouter(
 )
 
 @router.post("/signup")
-async def signup(data: SigninRequest):
+async def signup(data: SignupRequest):
 
-    return{
-        "message": "Signup Router Working"
-    }
+    return await signup_user(data)
+
+@router.post("/signin")
+async def signin(data: SigninRequest):
+    return await signin_user(data)

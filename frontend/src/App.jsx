@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Login from "./pages/SignIn";
 import Signup from "./pages/SignUp";
+import Workspace from "./pages/Workspace";
 
 function App() {
   return (
@@ -22,7 +23,13 @@ function App() {
         path="/signup"
         element={<Signup />}
       />
-
+      <Route
+      path="/Workspace"
+      element={
+      <ProtectedRoute>
+            <Workspace />
+        </ProtectedRoute>
+      }/>
     </Routes>
   );
 }

@@ -7,10 +7,15 @@ def is_url(text: str) -> bool:
     Check whether the input is a valid URL.
     """
     try:
-        result = urlparse(text)
-        return all([result.scheme, result.netloc])
+        result = urlparse(text.strip())
+        return (
+            result.scheme in ["http", "https"]
+            and bool(result.netloc)
+        )
+
     except Exception:
         return False
+
 
 
 def detect_input_type(user_input: str):
@@ -23,6 +28,7 @@ def detect_input_type(user_input: str):
         github
         pdf 
         image 
+        folder
         chat
     """
 
@@ -31,14 +37,25 @@ def detect_input_type(user_input: str):
     # URL Detection
     if is_url(user_input):
 
-        if "youtube.com" in user_input or "youtu.be" in user_input:
+        parsed = urlparse(user_input)
+
+        hostname = parsed.netloc.lower()
+
+        # Remove www.
+        hostname = hostname.removeprefix("www.")
+
+        if hostname == "youtube.com" or hostname.endswith(".youtube.com"):
             return "youtube"
 
-        elif "github.com" in user_input:
+        elif hostname == "youtu.be":
+            return "youtube"
+
+        elif hostname == "github.com" or hostname.endswith(".github.com"):
             return "github"
 
         else:
             return "website"
+
 
     # Local File Detection
     # Local File Detection

@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 import os
-
+from fastapi import HTTPException, status
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -65,5 +65,7 @@ def verify_access_token(token: str):
 
         return payload
     except JWTError:
-
-        raise Exception("Invalid or Expired Token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or Expired Token"
+        )

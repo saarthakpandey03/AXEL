@@ -61,5 +61,7 @@ def get_history(session_id: str):
     return json.loads(history)
 
 def clear_session(session_id: str):
-    redis_client.delete(session_id)
+    redis_client.delete(
+        f"session:{session_id}"
+    )
     
