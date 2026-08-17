@@ -13,3 +13,5 @@ class QuestionRequest(BaseModel):
 
 class MessageRequest(BaseModel):
     message: str
+    provider: str = "gemini"
+    model: str | None = None

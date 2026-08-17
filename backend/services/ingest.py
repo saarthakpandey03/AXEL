@@ -149,9 +149,18 @@ def ingest_folder(session_id: str, folder_path: str):
     }
 
 
-def ingest_image(session_id: str, image_path: str):
+def ingest_image(
+    session_id: str,
+    image_path: str,
+    provider: str = "gemini",
+    model: str | None = None
+):
 
-    text = load_image(image_path)
+    text = load_image(
+        image_path,
+        provider=provider,
+        model=model
+    )
 
     if not text.strip():
         return {

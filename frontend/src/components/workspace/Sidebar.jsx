@@ -8,24 +8,46 @@ const Sidebar = ({
     onNewChat,
     mobile,
     recentChats,
+    onSearch,
     setRecentChats,
-    onLogout,
     onSelectChat,
+    onLogout,
 }) => {
 
     return (
-
         <aside
-            className={`h-full bg-[#171717] flex flex-col transition-all duration-300 ${
-                collapsed ? "w-20" : "w-72"
-            }`}
+            className={`
+                relative
+                flex
+                h-full
+                shrink-0
+                flex-col
+                bg-white
+                text-slate-900
+                transition-all
+                duration-300
+                dark:bg-[#171717]
+                dark:text-white
+                ${
+                    collapsed
+                        ? "w-20"
+                        : "w-72"
+                }
+            `}
         >
+
+            {/* HEADER */}
 
             <SidebarHeader
                 collapsed={collapsed}
                 setCollapsed={setCollapsed}
+                 onSearch={onSearch}
                 onNewChat={onNewChat}
+                mobile={mobile}
             />
+
+
+            {/* HISTORY */}
 
             <SidebarHistory
                 collapsed={collapsed}
@@ -34,13 +56,15 @@ const Sidebar = ({
                 onSelectChat={onSelectChat}
             />
 
+
+            {/* PROFILE */}
+
             <ProfileMenu
                 collapsed={collapsed}
                 onLogout={onLogout}
             />
 
         </aside>
-
     );
 };
 

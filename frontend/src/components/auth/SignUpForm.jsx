@@ -237,39 +237,40 @@ const SignUpForm = () => {
 
         } catch (error) {
 
-            console.log(
-                "SIGNUP ERROR:",
-                error.response?.data
-            );
+    console.error("SIGNUP ERROR:", error);
 
+    const status = error?.response?.status;
+    const detail = error?.response?.data?.detail;
 
-            const status =
-                error.response?.status;
+    let message = "Unable to create account.";
 
+    if (typeof detail === "string") {
+        message = detail;
+    }
 
-            if (status === 409) {
+    if (Array.isArray(detail)) {
+        message = detail
+            .map((item) => item?.msg)
+            .filter(Boolean)
+            .join(", ");
+    }
 
-                setErrors({
-                    server:
-                        "Email already registered.",
-                });
+    if (!error?.response) {
+        message = "Backend server is not reachable.";
+    }
 
-            } else {
+    console.log("STATUS:", status);
+    console.log("DETAIL:", detail);
 
-                setErrors({
-                    server:
-                        error.response?.data
-                            ?.detail ||
-                        "Unable to create account.",
-                });
+    setErrors({
+        server: message,
+    });
+
+            } finally {
+
+                setLoading(false);
 
             }
-
-        } finally {
-
-            setLoading(false);
-
-        }
     };
 
 

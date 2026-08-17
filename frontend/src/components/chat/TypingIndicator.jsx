@@ -4,7 +4,7 @@ const TypingIndicator = () => {
 
         <div className="mb-8 flex gap-3 sm:gap-4">
 
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-black">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
                 A
             </div>
 

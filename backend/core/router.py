@@ -1,7 +1,6 @@
 from backend.core.classifier import detect_input_type
 from backend.core.chat import chat
 from backend.core.rag import ask_question
-from backend.core.session import get_active_collection
 
 from backend.services.ingest import (
     ingest_youtube,
@@ -13,7 +12,12 @@ from backend.services.ingest import (
 )
 
 
-def process_message(session_id:str,message: str):
+def process_message(
+    session_id: str,
+    message: str,
+    provider: str = "gemini",
+    model: str | None = None
+):
     """
     Main Brain of AXEL
 
@@ -22,51 +26,98 @@ def process_message(session_id:str,message: str):
 
     input_type = detect_input_type(message)
 
-    # -----------------------------
-    # Knowledge Ingestion
-    # -----------------------------
+
+    # =====================================================
+    # KNOWLEDGE INGESTION
+    # =====================================================
 
     if input_type == "youtube":
-        return ingest_youtube(session_id, message)
+
+        return ingest_youtube(
+            session_id,
+            message
+        )
+
 
     elif input_type == "website":
-        return ingest_website(session_id, message)
+
+        return ingest_website(
+            session_id,
+            message
+        )
+
 
     elif input_type == "github":
-        return ingest_github(session_id, message)
+
+        return ingest_github(
+            session_id,
+            message
+        )
+
 
     elif input_type == "image":
-        return ingest_image(session_id, message)
+
+        return ingest_image(
+            session_id=session_id,
+            image_path=message,
+            provider=provider,
+            model=model
+        )
+
 
     elif input_type == "document":
-        return ingest_document(session_id, message)
-    
-    elif input_type == "folder":
-        return ingest_folder(session_id, message)
-    
 
-    # -----------------------------
-    # Conversation
-    # -----------------------------
+        return ingest_document(
+            session_id,
+            message
+        )
+
+
+    elif input_type == "folder":
+
+        return ingest_folder(
+            session_id,
+            message
+        )
+
+
+    # =====================================================
+    # CONVERSATION / RAG
+    # =====================================================
 
     elif input_type == "chat":
 
         answer = ask_question(
             session_id=session_id,
-            question=message
+            question=message,
+            provider=provider,
+            model=model
         )
+
+
+        # -------------------------------------------------
+        # No Knowledge Source
+        # -------------------------------------------------
 
         if answer == "No Knowledge Source loaded":
 
             answer = chat(
                 session_id=session_id,
-                question=message
+                question=message,
+                provider=provider,
+                model=model
             )
+
 
         return {
             "status": "success",
             "answer": answer
         }
+
+
+    # =====================================================
+    # UNSUPPORTED
+    # =====================================================
 
     return {
         "status": "error",

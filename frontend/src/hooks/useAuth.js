@@ -38,13 +38,18 @@ const useAuth = () => {
 
 
     const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("session_id");
-    localStorage.removeItem("axel_messages");
 
-    navigate("/signin", { replace: true });
-};
+        // Sirf authentication data remove karo
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        // Chats ko DON'T remove karo
+        // axel_messages
+        // axel_recent_chats
+        // session_id
+
+        navigate("/signin", { replace: true });
+    };
 
 
     return {

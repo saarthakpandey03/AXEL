@@ -162,16 +162,30 @@ const SidebarHistory = ({
                             ? chat.title
                             : undefined
                     }
-                    className={`flex w-full items-center rounded-xl text-left text-slate-300 transition hover:bg-slate-800 hover:text-white ${
-                        collapsed
-                            ? "justify-center p-3"
-                            : "gap-3 px-3 py-3 pr-10"
-                    }`}
+                    className={`
+                        flex
+                        w-full
+                        items-center
+                        rounded-xl
+                        text-left
+                        text-slate-700
+                        transition
+                        hover:bg-slate-100
+                        hover:text-slate-900
+                        dark:text-slate-300
+                        dark:hover:bg-slate-800
+                        dark:hover:text-white
+                        ${
+                            collapsed
+                                ? "justify-center p-3"
+                                : "gap-3 px-3 py-3 pr-10"
+                        }
+                    `}
                 >
 
                     <MessageSquare
                         size={17}
-                        className="shrink-0 text-slate-400"
+                        className="shrink-0 text-slate-500 dark:text-slate-400"
                     />
 
 
@@ -194,22 +208,28 @@ const SidebarHistory = ({
                                     }
                                     onKeyDown={(e) => {
 
-                                        if (e.key === "Enter")
-                                         {
-                                            saveRename(
-                                                chat.id
-                                            );
+                                        if (e.key === "Enter") {
+                                            saveRename(chat.id);
                                         }
 
-                                        if (e.key === "Escape")
-                                             {
-                                            setEditingChat(
-                                                null
-                                            );
+                                        if (e.key === "Escape") {
+                                            setEditingChat(null);
                                         }
 
                                     }}
-                                    className="min-w-0 flex-1 rounded-md bg-[#333] px-2 py-1 text-sm text-white outline-none"
+                                    className="
+                                        min-w-0
+                                        flex-1
+                                        rounded-md
+                                        bg-slate-100
+                                        px-2
+                                        py-1
+                                        text-sm
+                                        text-slate-900
+                                        outline-none
+                                        dark:bg-[#333]
+                                        dark:text-white
+                                    "
                                 />
 
                             ) : (
@@ -227,16 +247,7 @@ const SidebarHistory = ({
                 </button>
 
 
-                {/* =========================
-                    Rename Controls
-                ========================= */}
-
-                {!collapsed && isEditing && null}
-
-
-                {/* =========================
-                    Three Dots
-                ========================= */}
+                {/* Three Dots */}
 
                 {!collapsed && !isEditing && (
 
@@ -253,7 +264,23 @@ const SidebarHistory = ({
                             );
 
                         }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-slate-500 opacity-0 transition group-hover:opacity-100 hover:bg-slate-700 hover:text-white"
+                        className="
+                            absolute
+                            right-2
+                            top-1/2
+                            -translate-y-1/2
+                            rounded-lg
+                            p-1.5
+                            text-slate-400
+                            opacity-0
+                            transition
+                            group-hover:opacity-100
+                            hover:bg-slate-200
+                            hover:text-slate-900
+                            dark:text-slate-500
+                            dark:hover:bg-slate-700
+                            dark:hover:text-white
+                        "
                     >
                         <MoreHorizontal size={18} />
                     </button>
@@ -261,14 +288,27 @@ const SidebarHistory = ({
                 )}
 
 
-                {/* =========================
-                    Menu
-                ========================= */}
+                {/* Menu */}
 
                 {openMenu === chat.id && (
 
                     <div
-                        className="absolute right-2 top-12 z-50 w-40 rounded-xl border border-slate-700 bg-[#242424] p-1.5 shadow-2xl"
+                        className="
+                            absolute
+                            right-2
+                            top-12
+                            z-50
+                            w-40
+                            rounded-xl
+                            border
+                            border-slate-200
+                            bg-white
+                            p-1.5
+                            shadow-xl
+                            dark:border-slate-700
+                            dark:bg-[#242424]
+                            dark:shadow-2xl
+                        "
                         onClick={(e) =>
                             e.stopPropagation()
                         }
@@ -281,17 +321,33 @@ const SidebarHistory = ({
                             onClick={() =>
                                 handlePin(chat.id)
                             }
-                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white"
+                            className="
+                                flex
+                                w-full
+                                items-center
+                                gap-3
+                                rounded-lg
+                                px-3
+                                py-2.5
+                                text-sm
+                                text-slate-700
+                                hover:bg-slate-100
+                                hover:text-slate-900
+                                dark:text-slate-300
+                                dark:hover:bg-slate-700
+                                dark:hover:text-white
+                            "
                         >
 
+                            {chat.pinned
+                                ? <PinOff size={16} />
+                                : <Pin size={16} />
+                            }
 
                             {chat.pinned
-                                ? (<PinOff size={16} />)
-                                : (<Pin size={16} />)}
-
-                                {chat.pinned
                                 ? "Unpin Chat"
-                                : "Pin Chat"}
+                                : "Pin Chat"
+                            }
 
                         </button>
 
@@ -303,7 +359,22 @@ const SidebarHistory = ({
                             onClick={() =>
                                 startRename(chat)
                             }
-                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-700 hover:text-white"
+                            className="
+                                flex
+                                w-full
+                                items-center
+                                gap-3
+                                rounded-lg
+                                px-3
+                                py-2.5
+                                text-sm
+                                text-slate-700
+                                hover:bg-slate-100
+                                hover:text-slate-900
+                                dark:text-slate-300
+                                dark:hover:bg-slate-700
+                                dark:hover:text-white
+                            "
                         >
 
                             <Pencil size={16} />
@@ -320,7 +391,20 @@ const SidebarHistory = ({
                             onClick={() =>
                                 handleDelete(chat.id)
                             }
-                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/10"
+                            className="
+                                flex
+                                w-full
+                                items-center
+                                gap-3
+                                rounded-lg
+                                px-3
+                                py-2.5
+                                text-sm
+                                text-red-500
+                                hover:bg-red-50
+                                dark:text-red-400
+                                dark:hover:bg-red-500/10
+                            "
                         >
 
                             <Trash2 size={16} />
@@ -342,7 +426,11 @@ const SidebarHistory = ({
     return (
 
         <div
-            className="flex-1 overflow-y-auto p-3"
+            className="
+                flex-1
+                overflow-y-auto
+                p-3
+            "
             onClick={() => setOpenMenu(null)}
         >
 
@@ -361,9 +449,7 @@ const SidebarHistory = ({
                             </p>
 
                             <div className="space-y-1">
-                                {pinnedChats.map(
-                                    renderChat
-                                )}
+                                {pinnedChats.map(renderChat)}
                             </div>
 
                         </div>

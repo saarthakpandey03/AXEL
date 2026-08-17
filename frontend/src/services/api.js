@@ -2,17 +2,30 @@ import axios from "axios";
 
 const api = axios.create({
     baseURL: "http://127.0.0.1:8000",
-    headers: {
-        "Content-Type": "application/json",
-    },
 });
 
 api.interceptors.request.use((config) => {
 
-    const token = localStorage.getItem("token");
+    // Auth endpoints ko Authorization header ki zarurat nahi
+    const isAuthRequest =
+        config.url?.startsWith("/auth/");
 
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    if (!isAuthRequest) {
+
+        const token =
+            localStorage.getItem("token");
+
+        if (token) {
+            config.headers.Authorization =
+                `Bearer ${token}`;
+        }
+    }
+
+    // FormData ke liye Content-Type manually mat set karo
+    // Axios/browser boundary automatically set karega.
+    if (!(config.data instanceof FormData)) {
+        config.headers["Content-Type"] =
+            "application/json";
     }
 
     return config;

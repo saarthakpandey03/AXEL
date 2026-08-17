@@ -1,21 +1,640 @@
 @import "tailwindcss";
 
-/* AXEL Dark Scrollbar */
+/*
+  AXEL THEME SETUP
+
+  IMPORTANT:
+  - Light mode is the default.
+  - Dark mode is controlled by <html class="dark">.
+  - ThemeSection.jsx adds/removes "dark" and "light" classes.
+*/
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+/* =========================================================
+   BASE
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    min-height: 100%;
+    width: 100%;
+}
+
+html {
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease;
+}
+
+body {
+    margin: 0;
+
+    background: var(--axel-bg);
+    color: var(--axel-text);
+
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease;
+}
+
+
+/* =========================================================
+   LIGHT THEME
+========================================================= */
+
+:root,
+html.light {
+    color-scheme: light;
+
+    --axel-bg: #ffffff;
+    --axel-bg-secondary: #f8fafc;
+    --axel-bg-tertiary: #f1f5f9;
+
+    --axel-surface: #ffffff;
+    --axel-surface-hover: #f1f5f9;
+
+    --axel-border: #e2e8f0;
+
+    --axel-text: #0f172a;
+    --axel-text-secondary: #334155;
+    --axel-text-muted: #64748b;
+
+    --axel-input: #f8fafc;
+
+    --axel-user-message: #e5e7eb;
+    --axel-user-message-text: #111827;
+
+    --axel-scrollbar-track: #f8fafc;
+    --axel-scrollbar-thumb: #cbd5e1;
+}
+
+
+/* =========================================================
+   DARK THEME
+========================================================= */
+
+html.dark {
+    color-scheme: dark;
+
+    --axel-bg: #171717;
+    --axel-bg-secondary: #181818;
+    --axel-bg-tertiary: #202020;
+
+    --axel-surface: #242424;
+    --axel-surface-hover: #2a2a2a;
+
+    --axel-border: #2a2a2a;
+
+    --axel-text: #ffffff;
+    --axel-text-secondary: #cbd5e1;
+    --axel-text-muted: #94a3b8;
+
+    --axel-input: #2f2f2f;
+
+    --axel-user-message: #2f2f2f;
+    --axel-user-message-text: #f8fafc;
+
+    --axel-scrollbar-track: #171717;
+    --axel-scrollbar-thumb: #555555;
+}
+
+
+/* =========================================================
+   GLOBAL THEME SURFACES
+========================================================= */
+
+html.light body {
+    background: var(--axel-bg);
+    color: var(--axel-text);
+}
+
+html.dark body {
+    background: var(--axel-bg);
+    color: var(--axel-text);
+}
+
+
+/* =========================================================
+   AXEL CHAT WINDOW
+========================================================= */
+
+.axel-chat-window {
+    background-color: var(--axel-bg);
+    color: var(--axel-text);
+}
+
+
+/* =========================================================
+   AXEL CHAT INPUT
+========================================================= */
+
+.axel-chat-input {
+    background-color: var(--axel-input);
+    border-color: var(--axel-border);
+    color: var(--axel-text);
+}
+
+.axel-chat-input input,
+.axel-chat-input textarea {
+    background-color: transparent;
+    color: var(--axel-text);
+}
+
+.axel-chat-input input::placeholder,
+.axel-chat-input textarea::placeholder {
+    color: var(--axel-text-muted);
+}
+
+
+/* =========================================================
+   AXEL USER MESSAGE
+========================================================= */
+
+.axel-user-message {
+    background-color: var(--axel-user-message);
+    color: var(--axel-user-message-text);
+}
+
+
+/* =========================================================
+   AXEL AI MESSAGE
+========================================================= */
+
+.axel-ai-message {
+    background: transparent;
+    color: var(--axel-text);
+}
+
+
+/* =========================================================
+   PROFILE MODAL
+========================================================= */
+
+.axel-profile-modal {
+    background-color: var(--axel-surface);
+    color: var(--axel-text);
+    border-color: var(--axel-border);
+}
+
+.axel-profile-header {
+    border-color: var(--axel-border);
+}
+
+.axel-profile-item {
+    color: var(--axel-text);
+}
+
+.axel-profile-item:hover {
+    background-color: var(--axel-surface-hover);
+}
+
+.axel-profile-description {
+    color: var(--axel-text-muted);
+}
+
+.axel-profile-divider {
+    border-color: var(--axel-border);
+}
+
+
+/* =========================================================
+   LIGHT MODE — FIX HARD-CODED DARK TAILWIND CLASSES
+   ---------------------------------------------------------
+   Some existing AXEL components still contain classes such as
+   bg-[#171717], bg-[#2b2b2b], bg-black, text-white, etc.
+   These rules make those existing components respond correctly
+   to light mode without changing their JSX immediately.
+========================================================= */
+
+
+/* ---------- Backgrounds ---------- */
+
+html.light .bg-\[\#171717\] {
+    background-color: #ffffff !important;
+}
+
+html.light .bg-\[\#181818\] {
+    background-color: #f8fafc !important;
+}
+
+html.light .bg-\[\#202020\] {
+    background-color: #ffffff !important;
+}
+
+html.light .bg-\[\#242424\] {
+    background-color: #f8fafc !important;
+}
+
+html.light .bg-\[\#2a2a2a\] {
+    background-color: #e2e8f0 !important;
+}
+
+html.light .bg-\[\#2b2b2b\] {
+    background-color: #f1f5f9 !important;
+}
+
+html.light .bg-\[\#2f2f2f\] {
+    background-color: #e5e7eb !important;
+}
+
+html.light .bg-black {
+    background-color: #ffffff !important;
+}
+
+
+/* ---------- Text ---------- */
+
+html.light .text-white {
+    color: #0f172a !important;
+}
+
+html.light .text-slate-100 {
+    color: #1e293b !important;
+}
+
+html.light .text-slate-200 {
+    color: #334155 !important;
+}
+
+html.light .text-slate-300 {
+    color: #475569 !important;
+}
+
+html.light .text-slate-400 {
+    color: #64748b !important;
+}
+
+html.light .text-slate-500 {
+    color: #64748b !important;
+}
+
+
+/*
+  Keep white text where white is intentionally used:
+  - Blue buttons
+  - Gradient logo/avatar
+*/
+
+html.light .bg-blue-600.text-white,
+html.light .bg-blue-500.text-white,
+html.light .bg-blue-700.text-white,
+html.light .bg-gradient-to-r.text-white,
+html.light .bg-gradient-to-br.text-white {
+    color: #ffffff !important;
+}
+
+
+/* ---------- Borders ---------- */
+
+html.light .border-\[\#2a2a2a\] {
+    border-color: #e2e8f0 !important;
+}
+
+html.light .border-slate-700 {
+    border-color: #cbd5e1 !important;
+}
+
+html.light .border-slate-800 {
+    border-color: #e2e8f0 !important;
+}
+
+
+/* ---------- Hover ---------- */
+
+html.light .hover\:bg-slate-800:hover {
+    background-color: #f1f5f9 !important;
+}
+
+html.light .hover\:bg-\[\#2a2a2a\]:hover {
+    background-color: #f1f5f9 !important;
+}
+
+html.light .hover\:bg-\[\#2b2b2b\]:hover {
+    background-color: #e2e8f0 !important;
+}
+
+html.light .hover\:bg-\[\#303030\]:hover {
+    background-color: #e2e8f0 !important;
+}
+
+
+/* =========================================================
+   LIGHT MODE — SIDEBAR
+========================================================= */
+
+html.light aside {
+    background-color: #ffffff;
+    color: #0f172a;
+}
+
+html.light aside .text-white {
+    color: #0f172a !important;
+}
+
+html.light aside .text-slate-300 {
+    color: #475569 !important;
+}
+
+html.light aside .text-slate-400 {
+    color: #64748b !important;
+}
+
+html.light aside .text-slate-500 {
+    color: #64748b !important;
+}
+
+html.light aside .border-slate-700 {
+    border-color: #cbd5e1 !important;
+}
+
+html.light aside .border-slate-800 {
+    border-color: #e2e8f0 !important;
+}
+
+html.light aside .hover\:bg-slate-800:hover {
+    background-color: #f1f5f9 !important;
+}
+
+html.light aside .hover\:bg-\[\#2b2b2b\]:hover {
+    background-color: #f1f5f9 !important;
+}
+
+
+/*
+  Sidebar buttons that intentionally stay white-on-blue
+*/
+
+html.light aside .bg-blue-600 {
+    color: #ffffff !important;
+}
+
+html.light aside .bg-gradient-to-br {
+    color: #ffffff !important;
+}
+
+
+/* =========================================================
+   LIGHT MODE — PROFILE MODAL
+========================================================= */
+
+html.light .axel-profile-modal {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+}
+
+html.light .axel-profile-header {
+    border-color: #e2e8f0 !important;
+}
+
+html.light .axel-profile-item {
+    color: #0f172a !important;
+}
+
+html.light .axel-profile-item:hover {
+    background-color: #f1f5f9 !important;
+}
+
+html.light .axel-profile-description {
+    color: #64748b !important;
+}
+
+html.light .axel-profile-divider {
+    border-color: #e2e8f0 !important;
+}
+
+
+/* =========================================================
+   LIGHT MODE — MODAL INTERNAL DARK CLASSES
+========================================================= */
+
+html.light .axel-profile-modal .bg-\[\#181818\] {
+    background-color: #f8fafc !important;
+}
+
+html.light .axel-profile-modal .bg-\[\#171717\] {
+    background-color: #ffffff !important;
+}
+
+html.light .axel-profile-modal .bg-slate-900 {
+    background-color: #f1f5f9 !important;
+}
+
+html.light .axel-profile-modal .bg-slate-800 {
+    background-color: #e2e8f0 !important;
+}
+
+html.light .axel-profile-modal .text-white {
+    color: #0f172a !important;
+}
+
+html.light .axel-profile-modal .text-slate-300 {
+    color: #475569 !important;
+}
+
+html.light .axel-profile-modal .text-slate-400 {
+    color: #64748b !important;
+}
+
+html.light .axel-profile-modal .border-slate-700 {
+    border-color: #cbd5e1 !important;
+}
+
+html.light .axel-profile-modal .border-slate-800 {
+    border-color: #e2e8f0 !important;
+}
+
+
+/*
+  Preserve white icons/text inside blue gradient avatars/buttons
+  inside the profile modal.
+*/
+
+html.light .axel-profile-modal .bg-blue-600,
+html.light .axel-profile-modal .bg-blue-500,
+html.light .axel-profile-modal .bg-gradient-to-r,
+html.light .axel-profile-modal .bg-gradient-to-br {
+    color: #ffffff !important;
+}
+
+
+/* =========================================================
+   LIGHT MODE — INPUTS / TEXTAREA
+========================================================= */
+
+html.light input,
+html.light textarea {
+    color: #0f172a;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+    color: #94a3b8;
+}
+
+
+/* =========================================================
+   LIGHT MODE — CHAT INPUT
+========================================================= */
+
+html.light .axel-chat-input {
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+    color: #0f172a;
+}
+
+
+/* Existing Tailwind chat-input container */
+
+html.light main .bg-\[\#2b2b2b\] {
+    background-color: #f8fafc !important;
+}
+
+html.light main .bg-\[\#2b2b2b\] textarea {
+    color: #0f172a !important;
+}
+
+html.light main .bg-\[\#2b2b2b\] textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+
+/* =========================================================
+   LIGHT MODE — USER MESSAGE
+========================================================= */
+
+html.light .axel-user-message {
+    background-color: #e5e7eb;
+    color: #111827;
+}
+
+
+/*
+  Fallback for the current MessageBubble JSX,
+  which uses bg-[#2f2f2f] for user messages.
+*/
+
+html.light main .bg-\[\#2f2f2f\] {
+    background-color: #e5e7eb !important;
+}
+
+
+/* =========================================================
+   LIGHT MODE — AI MESSAGE
+========================================================= */
+
+html.light .axel-ai-message {
+    background: transparent;
+    color: #0f172a;
+}
+
+
+/* =========================================================
+   DARK MODE — CHAT
+========================================================= */
+
+html.dark .axel-chat-window {
+    background-color: #171717;
+    color: #ffffff;
+}
+
+html.dark .axel-chat-input {
+    background-color: #2f2f2f;
+    border-color: #404040;
+    color: #ffffff;
+}
+
+html.dark .axel-user-message {
+    background-color: #2f2f2f;
+    color: #f8fafc;
+}
+
+html.dark .axel-ai-message {
+    background: transparent;
+    color: #f1f5f9;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
 
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
-::-webkit-scrollbar-track {
+html.light ::-webkit-scrollbar-track {
+    background: #f8fafc;
+}
+
+html.dark ::-webkit-scrollbar-track {
     background: #171717;
 }
 
+html.light ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    background: #555555;
+}
+
 ::-webkit-scrollbar-thumb {
-    background: #555;
     border-radius: 999px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #666;
+html.light ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+
+/* =========================================================
+   SMOOTH THEME TRANSITION
+========================================================= */
+
+html,
+body,
+button,
+input,
+textarea,
+main,
+aside,
+header,
+section,
+div {
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+/* =========================================================
+   MOBILE / ROOT SAFETY
+========================================================= */
+
+body {
+    overflow: scrolling;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
 }
