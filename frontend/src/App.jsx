@@ -5,10 +5,10 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import Landing from "./pages/Landing";
-import Login from "./pages/SignIn";
-import Signup from "./pages/SignUp";
-import Workspace from "./pages/Workspace";
+import Landing from "./pages/Landing.jsx";
+import Login from "./pages/SignIn.jsx";
+import Signup from "./pages/SignUp.jsx";
+import Workspace from "./pages/Workspace.jsx";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
