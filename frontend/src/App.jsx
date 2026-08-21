@@ -1,9 +1,5 @@
 import { useEffect } from "react";
-import {
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Landing from "./pages/Landing.jsx";
 import Login from "./pages/SignIn.jsx";
@@ -32,26 +28,16 @@ function PublicRoute({ children }) {
 
 function App() {
   useEffect(() => {
-    document.documentElement.classList.toggle(
-      "dark",
-      true
-    );
+    document.documentElement.classList.toggle("dark", true);
 
-    document.documentElement.classList.toggle(
-      "light",
-      false
-    );
+    document.documentElement.classList.toggle("light", false);
 
-    document.documentElement.style.colorScheme =
-      "dark";
+    document.documentElement.style.colorScheme = "dark";
   }, []);
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<Landing />}
-      />
+      <Route path="/" element={<Landing />} />
 
       <Route
         path="/signin"
@@ -80,15 +66,7 @@ function App() {
         }
       />
 
-      <Route
-        path="*"
-        element={
-          <Navigate
-            to="/"
-            replace
-          />
-        }
-      />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

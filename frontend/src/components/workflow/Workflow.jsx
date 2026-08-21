@@ -7,7 +7,7 @@ import {
 } from "framer-motion";
 
 import WorkflowCard from "./WorkFlowCard.jsx";
-import { workflow } from "./workflowData.jsx";
+import { workflow } from "./WorkflowData.jsx";
 
 const STEP_HEIGHT = 192;
 
