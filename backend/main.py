@@ -52,6 +52,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
+    allow_origin="https://axel-ai.vercel.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -200,6 +201,6 @@ app.include_router(
     auth_router
 )
 
-app.include_router(
-    payment_router
-)
+# app.include_router(
+#     payment_router
+# )
