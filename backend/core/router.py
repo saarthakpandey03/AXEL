@@ -1,7 +1,7 @@
 from backend.core.classifier import detect_input_type
 from backend.core.chat import chat
 from backend.core.rag import ask_question
-
+from backend.services.image_generation import generate_image
 from backend.services.ingest import (
     ingest_youtube,
     ingest_website,
@@ -25,6 +25,13 @@ def process_message(
     """
 
     input_type = detect_input_type(message)
+
+    print("\n========== ROUTER DEBUG ==========")
+    print("message:", message)
+    print("input_type:", input_type)
+    print("provider:", provider)
+    print("model:", model)
+    print("==================================\n")
 
 
     # =====================================================

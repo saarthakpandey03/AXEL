@@ -7,7 +7,6 @@ from fastapi import (
 )
 
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from backend.payment.router import router as payment_router
 
 import uuid
@@ -27,16 +26,6 @@ from backend.core.router import process_message
 # =========================================================
 
 from backend.schemas.chat import MessageRequest
-from backend.schemas.image import ImageGenerationRequest
-
-
-# =========================================================
-# IMAGE GENERATION
-# =========================================================
-
-from backend.image_generation.generator import (
-    generate_image,
-)
 
 
 # =========================================================
@@ -66,33 +55,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
-
-# =========================================================
-# GENERATED IMAGE DIRECTORY
-# =========================================================
-
-GENERATED_IMAGE_DIR = (
-    "backend/generated_images"
-)
-
-
-os.makedirs(
-    GENERATED_IMAGE_DIR,
-    exist_ok=True,
-)
-
-
-# =========================================================
-# SERVE GENERATED IMAGES
-# =========================================================
-
-app.mount(
-    "/generated-images",
-    StaticFiles(
-        directory=GENERATED_IMAGE_DIR,
-    ),
-    name="generated-images",
 )
 
 
@@ -231,77 +193,13 @@ async def upload(
 
 
 # =========================================================
-# IMAGE GENERATION
-# =========================================================
-
-@app.post("/generate-image")
-def generate_image_endpoint(
-    data: ImageGenerationRequest,
-
-    session_id: str = Depends(
-        get_session_id
-    ),
-):
-
-    try:
-
-        # -------------------------------------------------
-        # Generate image
-        # -------------------------------------------------
-
-        result = generate_image(
-            prompt=data.prompt,
-            aspect_ratio=data.aspect_ratio,
-            image_size=data.image_size,
-        )
-
-
-        # -------------------------------------------------
-        # Response
-        # -------------------------------------------------
-
-        return {
-            "status": "success",
-
-            "type": "image",
-
-            "image_url":
-                result["url"],
-
-            "filename":
-                result["filename"],
-
-            "prompt":
-                data.prompt,
-
-            "session_id":
-                session_id,
-        }
-
-
-    except Exception as e:
-
-        print(
-            "[IMAGE GENERATION ERROR]",
-            str(e),
-        )
-
-        return {
-            "status": "error",
-
-            "message":
-                str(e),
-
-            "session_id":
-                session_id,
-        }
-
-
-# =========================================================
 # AUTH ROUTES
 # =========================================================
 
 app.include_router(
     auth_router
 )
-app.include_router(payment_router)
+
+app.include_router(
+    payment_router
+)

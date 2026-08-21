@@ -1,6 +1,7 @@
 import os
 
 from datetime import datetime
+from pyexpat import model
 from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
@@ -53,7 +54,7 @@ groq_client = OpenAI(
 
 DEFAULT_MODELS = {
     "gemini": "gemini-3.5-flash",
-    "groq": "llama-3.3-70b-versatile",
+    "groq": "openai/gpt-oss-120b",
 }
 
 
@@ -101,6 +102,12 @@ def chat(
 ):
 
     provider = provider.lower().strip()
+
+    print("\n========== CHAT DEBUG ==========")
+    print("provider received:", provider)
+    print("model received:", model)
+    print("DEFAULT_MODELS:", DEFAULT_MODELS)
+    print("================================\n")
 
 
     # =====================================================
@@ -233,80 +240,53 @@ def chat(
 
         selected_model = (
             model
-            or DEFAULT_MODELS["groq"]
+            if model
+            else DEFAULT_MODELS["groq"]
         )
 
-
-        print(
-            f"[AXEL] Groq request | "
-            f"model={selected_model}"
-        )
-
+        print("\n========== GROQ DEBUG ==========")
+        print("Provider:", provider)
+        print("Model received:", model)
+        print("Final model:", selected_model)
+        print("================================\n")
 
         try:
 
-            response = (
-                groq_client
-                .chat
-                .completions
-                .create(
+            response = groq_client.chat.completions.create(
 
-                    model=selected_model,
+                model=selected_model,
 
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": final_prompt
-                        }
-                    ]
-                )
+                messages=[
+                    {
+                        "role": "user",
+                        "content": final_prompt
+                    }
+                ]
             )
 
+            print("[GROQ RAW RESPONSE]", response)
 
-            answer = (
-                response
-                .choices[0]
-                .message
-                .content
-            )
-
+            answer = response.choices[0].message.content
 
             if not answer:
-
                 raise RuntimeError(
                     "Groq returned an empty response."
                 )
-
 
             answer = answer.strip()
 
-
-            if not answer:
-
-                raise RuntimeError(
-                    "Groq returned an empty response."
-                )
-
+            return answer
 
         except Exception as e:
 
-            print(
-                "[GROQ ERROR]"
-            )
-
-            print(
-                f"Type: {type(e).__name__}"
-            )
-
-            print(
-                f"Message: {str(e)}"
-            )
+            print("\n========== GROQ ERROR ==========")
+            print(f"Type: {type(e).__name__}")
+            print(f"Message: {str(e)}")
+            print("================================\n")
 
             raise RuntimeError(
                 f"Groq request failed: {str(e)}"
             )
-
-
     # =====================================================
     # SAVE MEMORY
     # =====================================================

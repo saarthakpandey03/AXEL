@@ -8,6 +8,7 @@ def is_url(text: str) -> bool:
     """
     try:
         result = urlparse(text.strip())
+
         return (
             result.scheme in ["http", "https"]
             and bool(result.netloc)
@@ -15,7 +16,6 @@ def is_url(text: str) -> bool:
 
     except Exception:
         return False
-
 
 
 def detect_input_type(user_input: str):
@@ -26,15 +26,22 @@ def detect_input_type(user_input: str):
         youtube
         website
         github
-        pdf 
-        image 
+        document
+        image
         folder
         chat
     """
 
     user_input = user_input.strip()
 
-    # URL Detection
+    if not user_input:
+        return "chat"
+
+
+    # =====================================================
+    # URL DETECTION
+    # =====================================================
+
     if is_url(user_input):
 
         parsed = urlparse(user_input)
@@ -44,22 +51,47 @@ def detect_input_type(user_input: str):
         # Remove www.
         hostname = hostname.removeprefix("www.")
 
-        if hostname == "youtube.com" or hostname.endswith(".youtube.com"):
+
+        # YouTube
+
+        if (
+            hostname == "youtube.com"
+            or hostname.endswith(".youtube.com")
+        ):
             return "youtube"
+
+
+        # YouTube short URL
 
         elif hostname == "youtu.be":
             return "youtube"
 
-        elif hostname == "github.com" or hostname.endswith(".github.com"):
+
+        # GitHub
+
+        elif (
+            hostname == "github.com"
+            or hostname.endswith(".github.com")
+        ):
             return "github"
+
+
+        # Other websites
 
         else:
             return "website"
 
 
-    # Local File Detection
-    # Local File Detection
-    _, extension = os.path.splitext(user_input.lower())
+    # =====================================================
+    # LOCAL FILE DETECTION
+    # =====================================================
+
+    _, extension = os.path.splitext(
+        user_input.lower()
+    )
+
+
+    # Documents
 
     if extension in [
         ".pdf",
@@ -69,9 +101,13 @@ def detect_input_type(user_input: str):
         ".xls",
         ".csv",
         ".txt",
-        ".md"
+        ".md",
     ]:
+
         return "document"
+
+
+    # Images
 
     elif extension in [
         ".png",
@@ -81,11 +117,21 @@ def detect_input_type(user_input: str):
         ".gif",
         ".bmp",
         ".tiff",
-        ".tif"
+        ".tif",
     ]:
+
         return "image"
 
+
+    # Folder
+
     elif os.path.isdir(user_input):
+
         return "folder"
+
+
+    # =====================================================
+    # NORMAL CHAT
+    # =====================================================
 
     return "chat"

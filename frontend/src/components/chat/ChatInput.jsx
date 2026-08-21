@@ -80,8 +80,8 @@ const ChatInput = ({
 
     groq: [
       {
-        label: "Llama 3.3 70B",
-        value: "llama-3.3-70b-versatile",
+          label: "GPT OSS 120B",
+          value: "openai/gpt-oss-120b"
       },
     ],
   };
@@ -134,9 +134,9 @@ const ChatInput = ({
   // =====================================================
 
   const handleProviderChange = (provider) => {
-    setSelectedProvider(provider);
-
+    
     const firstModel = models[provider]?.[0];
+    setSelectedProvider(provider);
 
     if (firstModel) {
       setSelectedModel(firstModel.value);
@@ -598,7 +598,10 @@ const ChatInput = ({
       // =================================================
       // NORMAL CHAT / FILE + QUESTION
       // =================================================
-
+      console.log("========== FRONTEND DEBUG ==========");
+      console.log("Provider:", selectedProvider);
+      console.log("Model:", selectedModel);
+      console.log("====================================");
       const data = await sendMessage(
         text,
         selectedProvider,

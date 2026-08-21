@@ -5,6 +5,7 @@ export const generateImage = async ({
     aspectRatio = "1:1",
     imageSize = "1K",
 }) => {
+
     const sessionId =
         localStorage.getItem("session_id") || "";
 

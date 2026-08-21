@@ -59,7 +59,7 @@ embedding_model = SentenceTransformer(
 
 DEFAULT_MODELS = {
     "gemini": "gemini-3.5-flash",
-    "groq": "llama-3.3-70b-versatile",
+    "groq": "openai/gpt-oss-120b",
 }
 
 
