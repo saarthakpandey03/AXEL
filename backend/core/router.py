@@ -11,6 +11,14 @@ def process_message(
 
     input_type = detect_input_type(message)
 
+    print("\n========== ROUTER DEBUG ==========")
+    print("message:", message)
+    print("input_type:", input_type)
+    print("provider:", provider)
+    print("model:", model)
+    print("==================================\n")
+
+
     # ==============================
     # KNOWLEDGE INGESTION
     # ==============================

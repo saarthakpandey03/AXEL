@@ -1,67 +1,106 @@
 from backend.storage.redis import redis_client
 import json
 
-def set_active_collection(session_id: str, collection: str):
+
+def get_session_key(session_id: str):
+    return f"session:{session_id}"
+
+
+# =========================================================
+# ACTIVE COLLECTION
+# =========================================================
+
+def set_active_collection(
+    session_id: str,
+    collection: str
+):
 
     redis_client.hset(
-        session_id,
+        get_session_key(session_id),
         "active_collection",
         collection
     )
 
+
 def get_active_collection(session_id: str):
 
-    collection = redis_client.hget(
-        session_id,
+    return redis_client.hget(
+        get_session_key(session_id),
         "active_collection"
     )
-    return collection
 
-def add_loaded_collection(session_id: str, collection: str):
 
-    collections = get_loaded_collections(session_id)
+# =========================================================
+# LOADED COLLECTIONS
+# =========================================================
 
-    collections.append(collection)
+def add_loaded_collection(
+    session_id: str,
+    collection: str
+):
 
-    collections = list(set(collections))
+    collections = get_loaded_collections(
+        session_id
+    )
+
+    if collection not in collections:
+        collections.append(collection)
 
     redis_client.hset(
-        f"session:{session_id}",
+        get_session_key(session_id),
         "loaded_collections",
         json.dumps(collections)
     )
 
+
 def get_loaded_collections(session_id: str):
 
     collections = redis_client.hget(
-        f"session:{session_id}",
+        get_session_key(session_id),
         "loaded_collections"
     )
+
     if collections is None:
         return []
+
     return json.loads(collections)
 
 
-def set_history(session_id: str, history):
-    
+# =========================================================
+# CONVERSATION HISTORY
+# =========================================================
+
+def set_history(
+    session_id: str,
+    history
+):
+
     redis_client.hset(
-        session_id,
+        get_session_key(session_id),
         "history",
         json.dumps(history)
     )
 
+
 def get_history(session_id: str):
 
     history = redis_client.hget(
-        session_id,
+        get_session_key(session_id),
         "history"
     )
+
     if history is None:
         return []
+
     return json.loads(history)
 
+
+# =========================================================
+# CLEAR SESSION
+# =========================================================
+
 def clear_session(session_id: str):
+
     redis_client.delete(
-        f"session:{session_id}"
+        get_session_key(session_id)
     )
-    
