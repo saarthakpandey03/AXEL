@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://127.0.0.1:8000",
+    baseURL:
+        import.meta.env.VITE_API_URL ||
+        "https://axel-a7ya.onrender.com",
 });
 
 api.interceptors.request.use((config) => {
@@ -22,7 +24,6 @@ api.interceptors.request.use((config) => {
     }
 
     // FormData ke liye Content-Type manually mat set karo
-    // Axios/browser boundary automatically set karega.
     if (!(config.data instanceof FormData)) {
         config.headers["Content-Type"] =
             "application/json";
