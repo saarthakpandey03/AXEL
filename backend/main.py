@@ -125,6 +125,19 @@ def home():
 
 
 # =========================================================
+# HEALTH CHECK
+# =========================================================
+
+@app.get("/health")
+def health_check():
+
+    return {
+        "status": "ok",
+        "message": "AXEL backend is running"
+    }
+
+
+# =========================================================
 # CHAT / MESSAGE
 # =========================================================
 
@@ -385,3 +398,4 @@ app.include_router(
 app.include_router(
     payment_router
 )
+
