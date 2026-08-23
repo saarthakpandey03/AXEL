@@ -33,6 +33,8 @@ from backend.schemas.chat import MessageRequest
 # =========================================================
 
 from backend.auth.router import router as auth_router
+from backend.database.mongo import client
+
 
 
 # =========================================================
@@ -45,6 +47,17 @@ app = FastAPI(
 )
 
 
+@app.on_event("startup")
+async def startup_event():
+
+    try:
+        await client.admin.command("ping")
+        print("MongoDB connected successfully")
+
+    except Exception as e:
+        print(
+            f"MongoDB connection failed: {e}"
+        )
 # =========================================================
 # CORS
 # =========================================================
@@ -53,6 +66,8 @@ app.add_middleware(
     CORSMiddleware,
 
     allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
         "https://axel-henna.vercel.app",
     ],
 

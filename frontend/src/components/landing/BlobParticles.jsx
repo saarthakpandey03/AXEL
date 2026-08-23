@@ -182,8 +182,13 @@ export default function BlobParticles({
       )
     );
 
+   if (geometry.attributes.position) {
     geometry.attributes.position.needsUpdate = true;
+  }
+
+  if (geometry.attributes.color) {
     geometry.attributes.color.needsUpdate = true;
+  }
 
   }, [buffers]);
 
@@ -361,14 +366,15 @@ export default function BlobParticles({
     // ---------------------------------------------------
 
     if (pointsRef.current?.geometry) {
-      const geometry =
-        pointsRef.current.geometry;
+      const geometry = pointsRef.current.geometry;
 
-      geometry.attributes.position.needsUpdate =
-        true;
+      if (geometry.attributes.position) {
+        geometry.attributes.position.needsUpdate = true;
+      }
 
-      geometry.attributes.color.needsUpdate =
-        true;
+      if (geometry.attributes.color) {
+        geometry.attributes.color.needsUpdate = true;
+      }
     }
 
     // ---------------------------------------------------
