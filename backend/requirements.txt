@@ -49,6 +49,5 @@ xlsxwriter==3.2.9
 youtube-transcript-api==1.2.4
 yt-dlp==2026.7.4
 
-# Optional: only if your code imports these
-beautifulsoup4==4.15.0
-pandas==3.0.5
+
+opencv-python-headless==5.0.0.93
