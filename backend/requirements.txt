@@ -1,25 +1,39 @@
-fastapi==0.139.2
-uvicorn==0.51.0
+fastapi
+uvicorn
 
-pymongo==4.17.0
-motor==3.7.1
-redis==8.0.1
+motor
+pymongo
+dnspython
 
-pydantic==2.13.4
-pydantic-settings==2.14.2
+python-dotenv
+pydantic
+pydantic-settings
+email-validator
 
-python-dotenv==1.2.2
-python-multipart==0.0.32
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
+python-multipart
 
-python-jose==3.5.0
-passlib==1.7.4
-bcrypt==5.0.0
-email-validator==2.3.0
+razorpay
+setuptools<81
 
-openai>=1.0.0
-google-genai>=1.0.0
+google-genai
+openai
 
-razorpay==1.4.2
-setuptools==80.9.0
+sentence-transformers
+chromadb
 
-requests==2.34.2
+redis
+
+requests
+httpx
+
+pypdf
+
+python-docx
+openpyxl
+python-pptx
+
+youtube-transcript-api
+yt-dlp
