@@ -166,4 +166,4 @@ youtube-transcript-api==1.2.4
 yt-dlp==2026.7.4
 zstandard==0.25.0
 razorpay==1.4.2
-setuptools
+setuptools==80.9.0
