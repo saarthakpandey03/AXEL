@@ -1,7 +1,8 @@
 from backend.core.classifier import detect_input_type
 from backend.core.chat import chat
-from backend.core.rag import ask_question
+
 from backend.services.image_generation import generate_image
+
 from backend.services.ingest import (
     ingest_youtube,
     ingest_website,
@@ -20,8 +21,6 @@ def process_message(
 ):
     """
     Main Brain of AXEL
-
-    Decides what to do with the user input.
     """
 
     input_type = detect_input_type(message)
@@ -33,37 +32,29 @@ def process_message(
     print("model:", model)
     print("==================================\n")
 
-
     # =====================================================
     # KNOWLEDGE INGESTION
     # =====================================================
 
     if input_type == "youtube":
-
         return ingest_youtube(
             session_id,
             message
         )
 
-
     elif input_type == "website":
-
         return ingest_website(
             session_id,
             message
         )
 
-
     elif input_type == "github":
-
         return ingest_github(
             session_id,
             message
         )
 
-
     elif input_type == "image":
-
         return ingest_image(
             session_id=session_id,
             image_path=message,
@@ -71,56 +62,35 @@ def process_message(
             model=model
         )
 
-
     elif input_type == "document":
-
         return ingest_document(
             session_id,
             message
         )
 
-
     elif input_type == "folder":
-
         return ingest_folder(
             session_id,
             message
         )
 
-
     # =====================================================
-    # CONVERSATION / RAG
+    # NORMAL CHAT
     # =====================================================
 
     elif input_type == "chat":
 
-        answer = ask_question(
+        answer = chat(
             session_id=session_id,
             question=message,
             provider=provider,
             model=model
         )
 
-
-        # -------------------------------------------------
-        # No Knowledge Source
-        # -------------------------------------------------
-
-        if answer == "No Knowledge Source loaded":
-
-            answer = chat(
-                session_id=session_id,
-                question=message,
-                provider=provider,
-                model=model
-            )
-
-
         return {
             "status": "success",
             "answer": answer
         }
-
 
     # =====================================================
     # UNSUPPORTED
