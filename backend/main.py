@@ -7,6 +7,7 @@ from fastapi import (
 )
 
 from fastapi.middleware.cors import CORSMiddleware
+
 from backend.payment.router import router as payment_router
 
 import uuid
@@ -18,6 +19,7 @@ import os
 # =========================================================
 
 from backend.core.dependencies import get_session_id
+
 from backend.core.router import process_message
 
 
@@ -33,8 +35,8 @@ from backend.schemas.chat import MessageRequest
 # =========================================================
 
 from backend.auth.router import router as auth_router
-from backend.database.mongo import client
 
+from backend.database.mongo import client
 
 
 # =========================================================
@@ -47,28 +49,46 @@ app = FastAPI(
 )
 
 
+# =========================================================
+# STARTUP
+# =========================================================
+
 @app.on_event("startup")
 async def startup_event():
 
     try:
+
         await client.admin.command("ping")
+
         print("MongoDB connected successfully")
 
     except Exception as e:
+
         print(
             f"MongoDB connection failed: {e}"
         )
+
+
+# =========================================================
+# CORS
+# =========================================================
+
 # =========================================================
 # CORS
 # =========================================================
 
 app.add_middleware(
+
     CORSMiddleware,
 
     allow_origins=[
+
         "http://localhost:5173",
+
         "http://127.0.0.1:5173",
+
         "https://axel-henna.vercel.app",
+
     ],
 
     allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
@@ -78,7 +98,9 @@ app.add_middleware(
     allow_methods=["*"],
 
     allow_headers=["*"],
+
 )
+
 
 # =========================================================
 # HOME
@@ -88,8 +110,10 @@ app.add_middleware(
 def home():
 
     return {
+
         "message":
-            "AXEL AI Assistant API Running 🚀"
+        "AXEL AI Assistant API Running 🚀"
+
     }
 
 
@@ -99,22 +123,108 @@ def home():
 
 @app.post("/message")
 def message(
+
     data: MessageRequest,
+
     session_id: str = Depends(
         get_session_id
     ),
+
 ):
 
-    response = process_message(
-        session_id=session_id,
-        message=data.message,
-        provider=data.provider,
-        model=data.model,
-    )
+    try:
 
-    response["session_id"] = session_id
+        print(
+            "\n========== MESSAGE REQUEST =========="
+        )
 
-    return response
+        print(
+            "session_id:",
+            session_id
+        )
+
+        print(
+            "message:",
+            data.message
+        )
+
+        print(
+            "provider:",
+            data.provider
+        )
+
+        print(
+            "model:",
+            data.model
+        )
+
+        print(
+            "=====================================\n"
+        )
+
+
+        response = process_message(
+
+            session_id=session_id,
+
+            message=data.message,
+
+            provider=data.provider,
+
+            model=data.model,
+
+        )
+
+
+        # Safety check
+        if not isinstance(
+            response,
+            dict
+        ):
+
+            response = {
+
+                "status": "success",
+
+                "answer": str(response),
+
+            }
+
+
+        response["session_id"] = session_id
+
+
+        return response
+
+
+    except Exception as e:
+
+        print(
+            "\n========== MESSAGE ERROR =========="
+        )
+
+        print(
+            f"Type: {type(e).__name__}"
+        )
+
+        print(
+            f"Message: {str(e)}"
+        )
+
+        print(
+            "===================================\n"
+        )
+
+
+        return {
+
+            "status": "error",
+
+            "message": str(e),
+
+            "session_id": session_id,
+
+        }
 
 
 # =========================================================
@@ -123,6 +233,7 @@ def message(
 
 @app.post("/upload")
 async def upload(
+
     file: UploadFile = File(...),
 
     provider: str = Form("gemini"),
@@ -132,7 +243,9 @@ async def upload(
     session_id: str = Depends(
         get_session_id
     ),
+
 ):
+
     """
     Upload any supported file.
 
@@ -143,13 +256,17 @@ async def upload(
         Optional specific model.
     """
 
+
     # -----------------------------------------------------
     # Create upload directory
     # -----------------------------------------------------
 
     os.makedirs(
+
         "backend/uploads",
+
         exist_ok=True,
+
     )
 
 
@@ -159,12 +276,16 @@ async def upload(
 
     content = await file.read()
 
+
     if len(content) > 25 * 1024 * 1024:
 
         return {
+
             "status": "error",
+
             "message":
-                "File size exceeds 25 MB.",
+            "File size exceeds 25 MB.",
+
         }
 
 
@@ -173,16 +294,25 @@ async def upload(
     # -----------------------------------------------------
 
     extension = os.path.splitext(
+
         file.filename or ""
+
     )[1]
 
+
     filename = (
+
         f"{uuid.uuid4()}{extension}"
+
     )
 
+
     file_path = os.path.join(
+
         "backend/uploads",
+
         filename,
+
     )
 
 
@@ -191,8 +321,11 @@ async def upload(
     # -----------------------------------------------------
 
     with open(
+
         file_path,
+
         "wb",
+
     ) as f:
 
         f.write(content)
@@ -202,16 +335,70 @@ async def upload(
     # Process uploaded file
     # -----------------------------------------------------
 
-    response = process_message(
-        session_id=session_id,
-        message=file_path,
-        provider=provider,
-        model=model,
-    )
+    try:
 
-    response["session_id"] = session_id
+        response = process_message(
 
-    return response
+            session_id=session_id,
+
+            message=file_path,
+
+            provider=provider,
+
+            model=model,
+
+        )
+
+
+        # Safety check
+        if not isinstance(
+            response,
+            dict
+        ):
+
+            response = {
+
+                "status": "success",
+
+                "answer": str(response),
+
+            }
+
+
+        response["session_id"] = session_id
+
+
+        return response
+
+
+    except Exception as e:
+
+        print(
+            "\n========== UPLOAD ERROR =========="
+        )
+
+        print(
+            f"Type: {type(e).__name__}"
+        )
+
+        print(
+            f"Message: {str(e)}"
+        )
+
+        print(
+            "==================================\n"
+        )
+
+
+        return {
+
+            "status": "error",
+
+            "message": str(e),
+
+            "session_id": session_id,
+
+        }
 
 
 # =========================================================
@@ -221,6 +408,11 @@ async def upload(
 app.include_router(
     auth_router
 )
+
+
+# =========================================================
+# PAYMENT ROUTES
+# =========================================================
 
 app.include_router(
     payment_router
