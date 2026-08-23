@@ -1,7 +1,28 @@
+import os
 import redis
+from dotenv import load_dotenv
 
-redis_client = redis.Redis(
-    host="localhost",
-    port=6379,
-    decode_responses=True
-)
+load_dotenv()
+
+
+REDIS_URL = os.getenv("REDIS_URL")
+
+
+if REDIS_URL:
+
+    redis_client = redis.from_url(
+        REDIS_URL,
+        decode_responses=True
+    )
+
+    print("[REDIS] Using REDIS_URL")
+
+else:
+
+    redis_client = redis.Redis(
+        host=os.getenv("REDIS_HOST", "localhost"),
+        port=int(os.getenv("REDIS_PORT", 6379)),
+        decode_responses=True
+    )
+
+    print("[REDIS] Using local Redis")
