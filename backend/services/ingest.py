@@ -1,15 +1,10 @@
-from backend.loaders.youtube import load as load_yt
-from backend.loaders.website import load as load_website
-from backend.loaders.document import load as load_document
-from backend.loaders.github import load as load_github
-from backend.loaders.folder import load as load_folder
-from backend.vision.image import load as load_image
-
 from backend.core.rag import index_document
 from backend.core.session import add_loaded_collection
 
 
 def ingest_youtube(session_id: str, url: str):
+
+    from backend.loaders.youtube import load as load_yt
 
     text = load_yt(url)
 
@@ -39,6 +34,8 @@ def ingest_youtube(session_id: str, url: str):
 
 def ingest_website(session_id: str, url: str):
 
+    from backend.loaders.website import load as load_website
+
     text = load_website(url)
 
     if not text.strip():
@@ -66,6 +63,8 @@ def ingest_website(session_id: str, url: str):
 
 
 def ingest_document(session_id: str, file_path: str):
+
+    from backend.loaders.document import load as load_document
 
     text = load_document(file_path)
 
@@ -95,6 +94,8 @@ def ingest_document(session_id: str, file_path: str):
 
 def ingest_github(session_id: str, url: str):
 
+    from backend.loaders.github import load as load_github
+
     text = load_github(url)
 
     if not text.strip():
@@ -122,6 +123,8 @@ def ingest_github(session_id: str, url: str):
 
 
 def ingest_folder(session_id: str, folder_path: str):
+
+    from backend.loaders.folder import load as load_folder
 
     text = load_folder(folder_path)
 
@@ -155,6 +158,8 @@ def ingest_image(
     provider: str = "gemini",
     model: str | None = None
 ):
+
+    from backend.vision.image import load as load_image
 
     text = load_image(
         image_path,

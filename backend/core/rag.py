@@ -3,9 +3,6 @@ import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from sentence_transformers import SentenceTransformer
-from google import genai
-from openai import OpenAI
 from dotenv import load_dotenv
 
 from backend.database.vectorDB import (
@@ -30,30 +27,6 @@ load_dotenv()
 
 
 # =========================================================
-# API CLIENTS
-# =========================================================
-
-gemini_client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
-
-
-groq_client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1",
-)
-
-
-# =========================================================
-# EMBEDDING MODEL
-# =========================================================
-
-embedding_model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
-)
-
-
-# =========================================================
 # DEFAULT MODELS
 # =========================================================
 
@@ -61,6 +34,77 @@ DEFAULT_MODELS = {
     "gemini": "gemini-3.5-flash",
     "groq": "openai/gpt-oss-120b",
 }
+
+
+# =========================================================
+# LAZY EMBEDDING MODEL
+# =========================================================
+
+_embedding_model = None
+
+
+def get_embedding_model():
+
+    global _embedding_model
+
+    if _embedding_model is None:
+
+        from sentence_transformers import SentenceTransformer
+
+        print("[AXEL] Loading embedding model...")
+
+        _embedding_model = SentenceTransformer(
+            "all-MiniLM-L6-v2"
+        )
+
+        print("[AXEL] Embedding model loaded.")
+
+    return _embedding_model
+
+
+# =========================================================
+# LAZY GEMINI CLIENT
+# =========================================================
+
+_gemini_client = None
+
+
+def get_gemini_client():
+
+    global _gemini_client
+
+    if _gemini_client is None:
+
+        from google import genai
+
+        _gemini_client = genai.Client(
+            api_key=os.getenv("GEMINI_API_KEY")
+        )
+
+    return _gemini_client
+
+
+# =========================================================
+# LAZY GROQ CLIENT
+# =========================================================
+
+_groq_client = None
+
+
+def get_groq_client():
+
+    global _groq_client
+
+    if _groq_client is None:
+
+        from openai import OpenAI
+
+        _groq_client = OpenAI(
+            api_key=os.getenv("GROQ_API_KEY"),
+            base_url="https://api.groq.com/openai/v1",
+        )
+
+    return _groq_client
 
 
 # =========================================================
@@ -111,6 +155,8 @@ def index_document(
     and stores embeddings inside ChromaDB.
     """
 
+    embedding_model = get_embedding_model()
+
     chunks = create_chunks(text)
 
     create_vector_db(
@@ -129,6 +175,8 @@ def generate_with_gemini(
     prompt: str,
     model: str | None = None
 ):
+
+    gemini_client = get_gemini_client()
 
     selected_model = (
         model
@@ -167,9 +215,7 @@ def generate_with_gemini(
 
         error_text = str(e)
 
-        print(
-            "[GEMINI RAG ERROR]"
-        )
+        print("[GEMINI RAG ERROR]")
 
         print(
             f"Type: {type(e).__name__}"
@@ -178,10 +224,6 @@ def generate_with_gemini(
         print(
             f"Message: {error_text}"
         )
-
-        # -------------------------------------------------
-        # Gemini quota / rate limit
-        # -------------------------------------------------
 
         if (
             "429" in error_text
@@ -192,10 +234,6 @@ def generate_with_gemini(
             raise RuntimeError(
                 "GEMINI_QUOTA_EXCEEDED"
             )
-
-        # -------------------------------------------------
-        # Other Gemini errors
-        # -------------------------------------------------
 
         raise RuntimeError(
             f"Gemini request failed: {error_text}"
@@ -210,6 +248,8 @@ def generate_with_groq(
     prompt: str,
     model: str | None = None
 ):
+
+    groq_client = get_groq_client()
 
     selected_model = (
         model
@@ -258,9 +298,7 @@ def generate_with_groq(
 
     except Exception as e:
 
-        print(
-            "[GROQ RAG ERROR]"
-        )
+        print("[GROQ RAG ERROR]")
 
         print(
             f"Type: {type(e).__name__}"
@@ -307,14 +345,13 @@ def ask_question(
     # LOADED KNOWLEDGE SOURCES
     # =====================================================
 
-    loaded_collections = (
-        get_loaded_collections(
-            session_id
-        )
+    loaded_collections = get_loaded_collections(
+        session_id
     )
 
 
     # No RAG source
+
     if not loaded_collections:
 
         return "No Knowledge Source loaded"
@@ -333,6 +370,8 @@ def ask_question(
     # =====================================================
     # SEARCH VECTOR DATABASE
     # =====================================================
+
+    embedding_model = get_embedding_model()
 
     context = search_all(
         query=question,
@@ -396,11 +435,6 @@ def ask_question(
 
         except RuntimeError as e:
 
-            # -------------------------------------------------
-            # Gemini quota exceeded
-            # Automatically use Groq
-            # -------------------------------------------------
-
             if str(e) == "GEMINI_QUOTA_EXCEEDED":
 
                 print(
@@ -442,7 +476,6 @@ def ask_question(
         "user",
         question,
     )
-
 
     add_message(
         session_id,
