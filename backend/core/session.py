@@ -2,6 +2,10 @@ from backend.storage.redis import redis_client
 import json
 
 
+# =========================================================
+# SESSION KEY
+# =========================================================
+
 def get_session_key(session_id: str):
     return f"session:{session_id}"
 
@@ -22,7 +26,9 @@ def set_active_collection(
     )
 
 
-def get_active_collection(session_id: str):
+def get_active_collection(
+    session_id: str
+):
 
     return redis_client.hget(
         get_session_key(session_id),
@@ -44,7 +50,10 @@ def add_loaded_collection(
     )
 
     if collection not in collections:
-        collections.append(collection)
+
+        collections.append(
+            collection
+        )
 
     redis_client.hset(
         get_session_key(session_id),
@@ -53,17 +62,31 @@ def add_loaded_collection(
     )
 
 
-def get_loaded_collections(session_id: str):
+def get_loaded_collections(
+    session_id: str
+):
 
     collections = redis_client.hget(
         get_session_key(session_id),
         "loaded_collections"
     )
 
-    if collections is None:
+    if not collections:
         return []
 
-    return json.loads(collections)
+    try:
+
+        return json.loads(
+            collections
+        )
+
+    except json.JSONDecodeError:
+
+        print(
+            "[WARNING] Invalid loaded_collections data."
+        )
+
+        return []
 
 
 # =========================================================
@@ -72,7 +95,7 @@ def get_loaded_collections(session_id: str):
 
 def set_history(
     session_id: str,
-    history
+    history: list
 ):
 
     redis_client.hset(
@@ -82,24 +105,40 @@ def set_history(
     )
 
 
-def get_history(session_id: str):
+def get_history(
+    session_id: str
+):
 
     history = redis_client.hget(
         get_session_key(session_id),
         "history"
     )
 
-    if history is None:
+    if not history:
         return []
 
-    return json.loads(history)
+    try:
+
+        return json.loads(
+            history
+        )
+
+    except json.JSONDecodeError:
+
+        print(
+            "[WARNING] Invalid history data."
+        )
+
+        return []
 
 
 # =========================================================
 # CLEAR SESSION
 # =========================================================
 
-def clear_session(session_id: str):
+def clear_session(
+    session_id: str
+):
 
     redis_client.delete(
         get_session_key(session_id)

@@ -7,11 +7,6 @@ from dotenv import load_dotenv
 from google import genai
 from openai import OpenAI
 
-from backend.memory.conversation import (
-    add_message,
-    build_context
-)
-
 
 # =========================================================
 # ENVIRONMENT
@@ -21,7 +16,7 @@ load_dotenv()
 
 
 # =========================================================
-# API CLIENTS
+# API KEYS
 # =========================================================
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
@@ -36,15 +31,27 @@ if not groq_api_key:
     print("[WARNING] GROQ_API_KEY is not configured.")
 
 
-gemini_client = genai.Client(
-    api_key=gemini_api_key
-)
+# =========================================================
+# API CLIENTS
+# =========================================================
+
+gemini_client = None
+groq_client = None
 
 
-groq_client = OpenAI(
-    api_key=groq_api_key,
-    base_url="https://api.groq.com/openai/v1"
-)
+if gemini_api_key:
+
+    gemini_client = genai.Client(
+        api_key=gemini_api_key
+    )
+
+
+if groq_api_key:
+
+    groq_client = OpenAI(
+        api_key=groq_api_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
 
 
 # =========================================================
@@ -67,8 +74,7 @@ You are AXEL, an intelligent AI assistant.
 Current date and time:
 {current_datetime}
 
-Use the previous conversation only when it is relevant.
-If the current question is unrelated, answer it independently.
+Answer the user's question naturally and directly.
 
 IMPORTANT:
 
@@ -77,10 +83,6 @@ IMPORTANT:
 - If the user asks for today's date, use the current date above.
 - Never say that you don't have access to the current time.
 - Never write placeholders such as [current time], [date], or [time].
-- Answer naturally and directly.
-
-Conversation History:
-{history}
 
 Current Question:
 {question}
@@ -102,10 +104,12 @@ def chat(
 
     provider = provider.lower().strip()
 
+
     print("\n========== CHAT DEBUG ==========")
-    print("provider received:", provider)
-    print("model received:", model)
-    print("DEFAULT_MODELS:", DEFAULT_MODELS)
+    print("session_id:", session_id)
+    print("provider:", provider)
+    print("model:", model)
+    print("question:", question)
     print("================================\n")
 
 
@@ -127,16 +131,6 @@ def chat(
 
 
     # =====================================================
-    # CONVERSATION HISTORY
-    # =====================================================
-
-    history = build_context(
-        session_id,
-        limit=10
-    )
-
-
-    # =====================================================
     # CURRENT INDIA TIME
     # =====================================================
 
@@ -152,7 +146,6 @@ def chat(
     # =====================================================
 
     final_prompt = SYSTEM_PROMPT.format(
-        history=history,
         question=question,
         current_datetime=current_datetime
     )
@@ -163,6 +156,13 @@ def chat(
     # =====================================================
 
     if provider == "gemini":
+
+        if gemini_client is None:
+
+            raise RuntimeError(
+                "GEMINI_API_KEY is not configured."
+            )
+
 
         selected_model = (
             model
@@ -188,7 +188,11 @@ def chat(
             )
 
 
-            answer = response.text
+            answer = getattr(
+                response,
+                "text",
+                None
+            )
 
 
             if not answer:
@@ -210,9 +214,10 @@ def chat(
 
         except Exception as e:
 
-            print("[GEMINI ERROR]")
+            print("\n========== GEMINI ERROR ==========")
             print(f"Type: {type(e).__name__}")
             print(f"Message: {str(e)}")
+            print("==================================\n")
 
             raise RuntimeError(
                 f"Gemini request failed: {str(e)}"
@@ -225,6 +230,13 @@ def chat(
 
     elif provider == "groq":
 
+        if groq_client is None:
+
+            raise RuntimeError(
+                "GROQ_API_KEY is not configured."
+            )
+
+
         selected_model = (
             model
             or DEFAULT_MODELS["groq"]
@@ -233,7 +245,6 @@ def chat(
 
         print("\n========== GROQ DEBUG ==========")
         print("Provider:", provider)
-        print("Model received:", model)
         print("Final model:", selected_model)
         print("================================\n")
 
@@ -245,6 +256,13 @@ def chat(
                 model=selected_model,
 
                 messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are AXEL, an intelligent "
+                            "and helpful AI assistant."
+                        )
+                    },
                     {
                         "role": "user",
                         "content": final_prompt
@@ -288,24 +306,6 @@ def chat(
             raise RuntimeError(
                 f"Groq request failed: {str(e)}"
             )
-
-
-    # =====================================================
-    # SAVE MEMORY
-    # =====================================================
-
-    add_message(
-        session_id,
-        "user",
-        question
-    )
-
-
-    add_message(
-        session_id,
-        "assistant",
-        answer
-    )
 
 
     # =====================================================

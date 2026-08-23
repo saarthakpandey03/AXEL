@@ -11,6 +11,7 @@ def process_message(
 
     input_type = detect_input_type(message)
 
+
     print("\n========== ROUTER DEBUG ==========")
     print("message:", message)
     print("input_type:", input_type)
@@ -19,11 +20,12 @@ def process_message(
     print("==================================\n")
 
 
-    # ==============================
+    # =====================================================
     # KNOWLEDGE INGESTION
-    # ==============================
+    # =====================================================
 
     if input_type == "youtube":
+
         from backend.services.ingest import ingest_youtube
 
         return ingest_youtube(
@@ -31,7 +33,9 @@ def process_message(
             message
         )
 
+
     elif input_type == "website":
+
         from backend.services.ingest import ingest_website
 
         return ingest_website(
@@ -39,7 +43,9 @@ def process_message(
             message
         )
 
+
     elif input_type == "github":
+
         from backend.services.ingest import ingest_github
 
         return ingest_github(
@@ -47,7 +53,9 @@ def process_message(
             message
         )
 
+
     elif input_type == "image":
+
         from backend.services.ingest import ingest_image
 
         return ingest_image(
@@ -57,7 +65,9 @@ def process_message(
             model=model
         )
 
+
     elif input_type == "document":
+
         from backend.services.ingest import ingest_document
 
         return ingest_document(
@@ -65,7 +75,9 @@ def process_message(
             message
         )
 
+
     elif input_type == "folder":
+
         from backend.services.ingest import ingest_folder
 
         return ingest_folder(
@@ -73,25 +85,43 @@ def process_message(
             message
         )
 
-    # ==============================
+
+    # =====================================================
     # NORMAL CHAT
-    # ==============================
+    # =====================================================
 
     elif input_type == "chat":
 
         answer = chat(
+
             session_id=session_id,
+
             question=message,
+
             provider=provider,
+
             model=model
+
         )
 
+
         return {
+
             "status": "success",
+
             "answer": answer
+
         }
 
+
+    # =====================================================
+    # UNSUPPORTED
+    # =====================================================
+
     return {
+
         "status": "error",
+
         "message": "Unsupported input."
+
     }

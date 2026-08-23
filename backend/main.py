@@ -8,8 +8,6 @@ from fastapi import (
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.payment.router import router as payment_router
-
 import uuid
 import os
 
@@ -19,7 +17,6 @@ import os
 # =========================================================
 
 from backend.core.dependencies import get_session_id
-
 from backend.core.router import process_message
 
 
@@ -36,6 +33,18 @@ from backend.schemas.chat import MessageRequest
 
 from backend.auth.router import router as auth_router
 
+
+# =========================================================
+# PAYMENT
+# =========================================================
+
+from backend.payment.router import router as payment_router
+
+
+# =========================================================
+# DATABASE
+# =========================================================
+
 from backend.database.mongo import client
 
 
@@ -44,8 +53,11 @@ from backend.database.mongo import client
 # =========================================================
 
 app = FastAPI(
+
     title="AXEL",
+
     version="1.0.0",
+
 )
 
 
@@ -73,10 +85,6 @@ async def startup_event():
 # CORS
 # =========================================================
 
-# =========================================================
-# CORS
-# =========================================================
-
 app.add_middleware(
 
     CORSMiddleware,
@@ -90,8 +98,6 @@ app.add_middleware(
         "https://axel-henna.vercel.app",
 
     ],
-
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
 
     allow_credentials=True,
 
@@ -112,6 +118,7 @@ def home():
     return {
 
         "message":
+
         "AXEL AI Assistant API Running 🚀"
 
     }
@@ -176,11 +183,7 @@ def message(
         )
 
 
-        # Safety check
-        if not isinstance(
-            response,
-            dict
-        ):
+        if not isinstance(response, dict):
 
             response = {
 
@@ -246,96 +249,65 @@ async def upload(
 
 ):
 
-    """
-    Upload any supported file.
-
-    provider:
-        gemini / groq
-
-    model:
-        Optional specific model.
-    """
-
-
-    # -----------------------------------------------------
-    # Create upload directory
-    # -----------------------------------------------------
-
-    os.makedirs(
-
-        "backend/uploads",
-
-        exist_ok=True,
-
-    )
-
-
-    # -----------------------------------------------------
-    # File size limit: 25 MB
-    # -----------------------------------------------------
-
-    content = await file.read()
-
-
-    if len(content) > 25 * 1024 * 1024:
-
-        return {
-
-            "status": "error",
-
-            "message":
-            "File size exceeds 25 MB.",
-
-        }
-
-
-    # -----------------------------------------------------
-    # Generate unique filename
-    # -----------------------------------------------------
-
-    extension = os.path.splitext(
-
-        file.filename or ""
-
-    )[1]
-
-
-    filename = (
-
-        f"{uuid.uuid4()}{extension}"
-
-    )
-
-
-    file_path = os.path.join(
-
-        "backend/uploads",
-
-        filename,
-
-    )
-
-
-    # -----------------------------------------------------
-    # Save file
-    # -----------------------------------------------------
-
-    with open(
-
-        file_path,
-
-        "wb",
-
-    ) as f:
-
-        f.write(content)
-
-
-    # -----------------------------------------------------
-    # Process uploaded file
-    # -----------------------------------------------------
-
     try:
+
+        os.makedirs(
+
+            "backend/uploads",
+
+            exist_ok=True,
+
+        )
+
+
+        content = await file.read()
+
+
+        if len(content) > 25 * 1024 * 1024:
+
+            return {
+
+                "status": "error",
+
+                "message":
+                    "File size exceeds 25 MB.",
+
+            }
+
+
+        extension = os.path.splitext(
+
+            file.filename or ""
+
+        )[1]
+
+
+        filename = (
+
+            f"{uuid.uuid4()}{extension}"
+
+        )
+
+
+        file_path = os.path.join(
+
+            "backend/uploads",
+
+            filename,
+
+        )
+
+
+        with open(
+
+            file_path,
+
+            "wb",
+
+        ) as f:
+
+            f.write(content)
+
 
         response = process_message(
 
@@ -350,11 +322,7 @@ async def upload(
         )
 
 
-        # Safety check
-        if not isinstance(
-            response,
-            dict
-        ):
+        if not isinstance(response, dict):
 
             response = {
 
