@@ -1,7 +1,6 @@
 import os
 
 from datetime import datetime
-from pyexpat import model
 from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
@@ -189,10 +188,6 @@ def chat(
             )
 
 
-            # ---------------------------------------------
-            # Validate response
-            # ---------------------------------------------
-
             answer = response.text
 
 
@@ -215,17 +210,9 @@ def chat(
 
         except Exception as e:
 
-            print(
-                "[GEMINI ERROR]"
-            )
-
-            print(
-                f"Type: {type(e).__name__}"
-            )
-
-            print(
-                f"Message: {str(e)}"
-            )
+            print("[GEMINI ERROR]")
+            print(f"Type: {type(e).__name__}")
+            print(f"Message: {str(e)}")
 
             raise RuntimeError(
                 f"Gemini request failed: {str(e)}"
@@ -240,15 +227,16 @@ def chat(
 
         selected_model = (
             model
-            if model
-            else DEFAULT_MODELS["groq"]
+            or DEFAULT_MODELS["groq"]
         )
+
 
         print("\n========== GROQ DEBUG ==========")
         print("Provider:", provider)
         print("Model received:", model)
         print("Final model:", selected_model)
         print("================================\n")
+
 
         try:
 
@@ -264,18 +252,31 @@ def chat(
                 ]
             )
 
-            print("[GROQ RAW RESPONSE]", response)
 
-            answer = response.choices[0].message.content
+            answer = (
+                response
+                .choices[0]
+                .message
+                .content
+            )
+
 
             if not answer:
+
                 raise RuntimeError(
                     "Groq returned an empty response."
                 )
 
+
             answer = answer.strip()
 
-            return answer
+
+            if not answer:
+
+                raise RuntimeError(
+                    "Groq returned an empty response."
+                )
+
 
         except Exception as e:
 
@@ -287,6 +288,8 @@ def chat(
             raise RuntimeError(
                 f"Groq request failed: {str(e)}"
             )
+
+
     # =====================================================
     # SAVE MEMORY
     # =====================================================
