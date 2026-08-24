@@ -11,7 +11,10 @@ from backend.database.vectorDB import (
 )
 
 from backend.services.chunking import create_chunks
-from backend.core.session import get_loaded_collections
+
+from backend.core.session import (
+    get_loaded_collections,
+)
 
 from backend.memory.conversation import (
     add_message,
@@ -20,7 +23,7 @@ from backend.memory.conversation import (
 
 
 # =========================================================
-# ENV
+# ENVIRONMENT
 # =========================================================
 
 load_dotenv()
@@ -49,15 +52,46 @@ def get_embedding_model():
 
     if _embedding_model is None:
 
-        from sentence_transformers import SentenceTransformer
+        try:
 
-        print("[AXEL] Loading embedding model...")
+            from sentence_transformers import (
+                SentenceTransformer
+            )
 
-        _embedding_model = SentenceTransformer(
-            "all-MiniLM-L6-v2"
+        except ImportError:
+
+            raise RuntimeError(
+                "sentence-transformers is not installed. "
+                "Install it using: "
+                "pip install sentence-transformers"
+            )
+
+        print(
+            "[AXEL] Loading embedding model..."
         )
 
-        print("[AXEL] Embedding model loaded.")
+        try:
+
+            _embedding_model = (
+                SentenceTransformer(
+                    "all-MiniLM-L6-v2"
+                )
+            )
+
+            print(
+                "[AXEL] Embedding model loaded successfully."
+            )
+
+        except Exception as e:
+
+            print(
+                "[AXEL] Embedding model error:",
+                str(e)
+            )
+
+            raise RuntimeError(
+                f"Failed to load embedding model: {str(e)}"
+            )
 
     return _embedding_model
 
@@ -77,8 +111,18 @@ def get_gemini_client():
 
         from google import genai
 
+        api_key = os.getenv(
+            "GEMINI_API_KEY"
+        )
+
+        if not api_key:
+
+            raise RuntimeError(
+                "GEMINI_API_KEY is not configured."
+            )
+
         _gemini_client = genai.Client(
-            api_key=os.getenv("GEMINI_API_KEY")
+            api_key=api_key
         )
 
     return _gemini_client
@@ -99,9 +143,21 @@ def get_groq_client():
 
         from openai import OpenAI
 
+        api_key = os.getenv(
+            "GROQ_API_KEY"
+        )
+
+        if not api_key:
+
+            raise RuntimeError(
+                "GROQ_API_KEY is not configured."
+            )
+
         _groq_client = OpenAI(
-            api_key=os.getenv("GROQ_API_KEY"),
-            base_url="https://api.groq.com/openai/v1",
+            api_key=api_key,
+            base_url=(
+                "https://api.groq.com/openai/v1"
+            )
         )
 
     return _groq_client
@@ -130,11 +186,10 @@ Instructions:
 
 - Answer using the retrieved context.
 - Answer in your own words.
-- Do NOT copy the context unnecessarily.
+- Do not copy the context unnecessarily.
 - Keep the answer concise and useful.
 - If the answer is not available in the context,
-  reply exactly:
-  "I don't know."
+  reply exactly: "I don't know."
 
 Current date and time:
 {current_datetime}
@@ -150,20 +205,52 @@ def index_document(
     collection_name: str,
     session_id: str
 ):
-    """
-    Converts text into a searchable knowledge base
-    and stores embeddings inside ChromaDB.
-    """
 
-    embedding_model = get_embedding_model()
+    if not text or not text.strip():
 
-    chunks = create_chunks(text)
+        raise ValueError(
+            "Cannot index empty text."
+        )
+
+    print(
+        f"[AXEL RAG] Indexing "
+        f"collection={collection_name}"
+    )
+
+    # Create chunks
+
+    chunks = create_chunks(
+        text
+    )
+
+    if not chunks:
+
+        raise RuntimeError(
+            "No chunks were created from the document."
+        )
+
+    print(
+        f"[AXEL RAG] Created "
+        f"{len(chunks)} chunks."
+    )
+
+    # Load embedding model only when needed
+
+    embedding_model = (
+        get_embedding_model()
+    )
+
+    # Store in vector database
 
     create_vector_db(
         chunks=chunks,
         model=embedding_model,
         collection_name=collection_name,
         session_id=session_id,
+    )
+
+    print(
+        "[AXEL RAG] Document indexed successfully."
     )
 
 
@@ -176,7 +263,9 @@ def generate_with_gemini(
     model: str | None = None
 ):
 
-    gemini_client = get_gemini_client()
+    gemini_client = (
+        get_gemini_client()
+    )
 
     selected_model = (
         model
@@ -190,14 +279,19 @@ def generate_with_gemini(
 
     try:
 
-        response = gemini_client.models.generate_content(
-            model=selected_model,
-            contents=prompt,
+        response = (
+            gemini_client
+            .models
+            .generate_content(
+                model=selected_model,
+                contents=prompt,
+            )
         )
 
         answer = response.text
 
         if not answer:
+
             raise RuntimeError(
                 "Gemini returned an empty response."
             )
@@ -205,6 +299,7 @@ def generate_with_gemini(
         answer = answer.strip()
 
         if not answer:
+
             raise RuntimeError(
                 "Gemini returned an empty response."
             )
@@ -215,7 +310,9 @@ def generate_with_gemini(
 
         error_text = str(e)
 
-        print("[GEMINI RAG ERROR]")
+        print(
+            "[GEMINI RAG ERROR]"
+        )
 
         print(
             f"Type: {type(e).__name__}"
@@ -227,8 +324,10 @@ def generate_with_gemini(
 
         if (
             "429" in error_text
-            or "RESOURCE_EXHAUSTED" in error_text
-            or "quota" in error_text.lower()
+            or "RESOURCE_EXHAUSTED"
+            in error_text
+            or "quota"
+            in error_text.lower()
         ):
 
             raise RuntimeError(
@@ -236,7 +335,8 @@ def generate_with_gemini(
             )
 
         raise RuntimeError(
-            f"Gemini request failed: {error_text}"
+            f"Gemini request failed: "
+            f"{error_text}"
         )
 
 
@@ -249,7 +349,9 @@ def generate_with_groq(
     model: str | None = None
 ):
 
-    groq_client = get_groq_client()
+    groq_client = (
+        get_groq_client()
+    )
 
     selected_model = (
         model
@@ -263,16 +365,21 @@ def generate_with_groq(
 
     try:
 
-        response = groq_client.chat.completions.create(
+        response = (
+            groq_client
+            .chat
+            .completions
+            .create(
 
-            model=selected_model,
+                model=selected_model,
 
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ],
+            )
         )
 
         answer = (
@@ -283,6 +390,7 @@ def generate_with_groq(
         )
 
         if not answer:
+
             raise RuntimeError(
                 "Groq returned an empty response."
             )
@@ -290,6 +398,7 @@ def generate_with_groq(
         answer = answer.strip()
 
         if not answer:
+
             raise RuntimeError(
                 "Groq returned an empty response."
             )
@@ -298,7 +407,9 @@ def generate_with_groq(
 
     except Exception as e:
 
-        print("[GROQ RAG ERROR]")
+        print(
+            "[GROQ RAG ERROR]"
+        )
 
         print(
             f"Type: {type(e).__name__}"
@@ -309,7 +420,8 @@ def generate_with_groq(
         )
 
         raise RuntimeError(
-            f"Groq request failed: {str(e)}"
+            f"Groq request failed: "
+            f"{str(e)}"
         )
 
 
@@ -324,8 +436,11 @@ def ask_question(
     model: str | None = None
 ):
 
-    provider = provider.lower().strip()
-
+    provider = (
+        provider
+        .lower()
+        .strip()
+    )
 
     # =====================================================
     # VALIDATE PROVIDER
@@ -340,22 +455,28 @@ def ask_question(
             f"Unsupported provider: {provider}"
         )
 
-
     # =====================================================
     # LOADED KNOWLEDGE SOURCES
     # =====================================================
 
-    loaded_collections = get_loaded_collections(
-        session_id
+    loaded_collections = (
+        get_loaded_collections(
+            session_id
+        )
     )
 
+    print(
+        "[AXEL RAG] Loaded collections:",
+        loaded_collections
+    )
 
-    # No RAG source
+    # No RAG source loaded
 
     if not loaded_collections:
 
-        return "No Knowledge Source loaded"
-
+        return (
+            "No Knowledge Source loaded."
+        )
 
     # =====================================================
     # CONVERSATION HISTORY
@@ -363,15 +484,20 @@ def ask_question(
 
     history = build_context(
         session_id,
-        limit=10
+        limit=10,
     )
 
+    # =====================================================
+    # LOAD EMBEDDING MODEL
+    # =====================================================
+
+    embedding_model = (
+        get_embedding_model()
+    )
 
     # =====================================================
     # SEARCH VECTOR DATABASE
     # =====================================================
-
-    embedding_model = get_embedding_model()
 
     context = search_all(
         query=question,
@@ -379,7 +505,6 @@ def ask_question(
         collections=loaded_collections,
         session_id=session_id,
     )
-
 
     # =====================================================
     # NO RELEVANT CONTEXT
@@ -389,86 +514,85 @@ def ask_question(
 
         return "I don't know."
 
-
     # =====================================================
     # CURRENT INDIA TIME
     # =====================================================
 
-    current_datetime = datetime.now(
-        ZoneInfo("Asia/Kolkata")
-    ).strftime(
-        "%A, %d %B %Y, %I:%M %p"
+    current_datetime = (
+        datetime.now(
+            ZoneInfo(
+                "Asia/Kolkata"
+            )
+        )
+        .strftime(
+            "%A, %d %B %Y, %I:%M %p"
+        )
     )
-
 
     # =====================================================
     # BUILD FINAL PROMPT
     # =====================================================
 
-    final_prompt = SYSTEM_PROMPT.format(
-        history=history,
-        context=context,
-        question=question,
-        current_datetime=current_datetime,
+    final_prompt = (
+        SYSTEM_PROMPT.format(
+            history=history,
+            context=context,
+            question=question,
+            current_datetime=current_datetime,
+        )
     )
 
-
     # =====================================================
-    # GENERATE ANSWER
-    # =====================================================
-
-    response = None
-
-
-    # =====================================================
-    # GEMINI
+    # GENERATE RESPONSE
     # =====================================================
 
     if provider == "gemini":
 
         try:
 
-            response = generate_with_gemini(
-                prompt=final_prompt,
-                model=model,
+            response = (
+                generate_with_gemini(
+                    prompt=final_prompt,
+                    model=model,
+                )
             )
 
         except RuntimeError as e:
 
-            if str(e) == "GEMINI_QUOTA_EXCEEDED":
+            if str(e) == (
+                "GEMINI_QUOTA_EXCEEDED"
+            ):
 
                 print(
-                    "[AXEL] Gemini Tokens exceeded."
+                    "[AXEL] Gemini quota exceeded."
                 )
 
                 print(
                     "[AXEL] Falling back to Groq..."
                 )
 
-                response = generate_with_groq(
-                    prompt=final_prompt,
-                    model=None,
+                response = (
+                    generate_with_groq(
+                        prompt=final_prompt,
+                        model=None,
+                    )
                 )
 
             else:
 
                 raise
 
+    else:
 
-    # =====================================================
-    # GROQ
-    # =====================================================
-
-    elif provider == "groq":
-
-        response = generate_with_groq(
-            prompt=final_prompt,
-            model=model,
+        response = (
+            generate_with_groq(
+                prompt=final_prompt,
+                model=model,
+            )
         )
 
-
     # =====================================================
-    # MEMORY
+    # SAVE MEMORY
     # =====================================================
 
     add_message(
@@ -482,10 +606,5 @@ def ask_question(
         "assistant",
         response,
     )
-
-
-    # =====================================================
-    # RETURN
-    # =====================================================
 
     return response
