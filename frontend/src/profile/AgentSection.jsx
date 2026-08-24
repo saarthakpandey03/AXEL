@@ -23,11 +23,10 @@ const AgentSection = () => {
         user?.name?.trim() ||
         user?.full_name?.trim() ||
         user?.username?.trim() ||
-        "Saarthak";
+        "User";
 
     const email =
         user?.email?.trim() || "";
-
 
     const initial =
         name.charAt(0).toUpperCase();

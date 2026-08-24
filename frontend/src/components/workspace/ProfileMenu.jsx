@@ -10,6 +10,22 @@ const ProfileMenu = ({
 
     const [open, setOpen] = useState(false);
 
+    // ================= USER DATA =================
+
+    const userData = JSON.parse(
+        localStorage.getItem("user") || "{}"
+    );
+
+    const userName =
+        userData.name ||
+        userData.username ||
+        userData.full_name ||
+        "User";
+
+    const initial =
+        userName.charAt(0).toUpperCase();
+
+
     return (
         <>
             {/* ================= PROFILE BUTTON ================= */}
@@ -70,7 +86,7 @@ const ProfileMenu = ({
                                 shadow-lg
                             "
                         >
-                            S
+                            {initial}
                         </div>
 
 
@@ -85,7 +101,7 @@ const ProfileMenu = ({
                                         dark:text-white
                                     "
                                 >
-                                    Saarthak
+                                    {userName}
                                 </p>
 
                                 <p
