@@ -40,63 +40,6 @@ DEFAULT_MODELS = {
 
 
 # =========================================================
-# LAZY EMBEDDING MODEL
-# =========================================================
-
-_embedding_model = None
-
-
-def get_embedding_model():
-
-    global _embedding_model
-
-    if _embedding_model is None:
-
-        try:
-
-            from sentence_transformers import (
-                SentenceTransformer
-            )
-
-        except ImportError:
-
-            raise RuntimeError(
-                "sentence-transformers is not installed. "
-                "Install it using: "
-                "pip install sentence-transformers"
-            )
-
-        print(
-            "[AXEL] Loading embedding model..."
-        )
-
-        try:
-
-            _embedding_model = (
-                SentenceTransformer(
-                    "all-MiniLM-L6-v2"
-                )
-            )
-
-            print(
-                "[AXEL] Embedding model loaded successfully."
-            )
-
-        except Exception as e:
-
-            print(
-                "[AXEL] Embedding model error:",
-                str(e)
-            )
-
-            raise RuntimeError(
-                f"Failed to load embedding model: {str(e)}"
-            )
-
-    return _embedding_model
-
-
-# =========================================================
 # LAZY GEMINI CLIENT
 # =========================================================
 
@@ -155,9 +98,7 @@ def get_groq_client():
 
         _groq_client = OpenAI(
             api_key=api_key,
-            base_url=(
-                "https://api.groq.com/openai/v1"
-            )
+            base_url="https://api.groq.com/openai/v1"
         )
 
     return _groq_client
@@ -212,16 +153,21 @@ def index_document(
             "Cannot index empty text."
         )
 
+
     print(
         f"[AXEL RAG] Indexing "
         f"collection={collection_name}"
     )
 
-    # Create chunks
+
+    # =====================================================
+    # CREATE CHUNKS
+    # =====================================================
 
     chunks = create_chunks(
         text
     )
+
 
     if not chunks:
 
@@ -229,25 +175,26 @@ def index_document(
             "No chunks were created from the document."
         )
 
+
     print(
         f"[AXEL RAG] Created "
         f"{len(chunks)} chunks."
     )
 
-    # Load embedding model only when needed
 
-    embedding_model = (
-        get_embedding_model()
-    )
-
-    # Store in vector database
+    # =====================================================
+    # STORE IN CHROMADB
+    #
+    # ChromaDB will handle embeddings internally.
+    # No SentenceTransformer / Torch required.
+    # =====================================================
 
     create_vector_db(
         chunks=chunks,
-        model=embedding_model,
         collection_name=collection_name,
         session_id=session_id,
     )
+
 
     print(
         "[AXEL RAG] Document indexed successfully."
@@ -267,15 +214,18 @@ def generate_with_gemini(
         get_gemini_client()
     )
 
+
     selected_model = (
         model
         or DEFAULT_MODELS["gemini"]
     )
 
+
     print(
         f"[AXEL] Gemini RAG request | "
         f"model={selected_model}"
     )
+
 
     try:
 
@@ -288,27 +238,34 @@ def generate_with_gemini(
             )
         )
 
+
         answer = response.text
+
 
         if not answer:
 
             raise RuntimeError(
                 "Gemini returned an empty response."
             )
+
 
         answer = answer.strip()
 
+
         if not answer:
 
             raise RuntimeError(
                 "Gemini returned an empty response."
             )
 
+
         return answer
+
 
     except Exception as e:
 
         error_text = str(e)
+
 
         print(
             "[GEMINI RAG ERROR]"
@@ -322,17 +279,17 @@ def generate_with_gemini(
             f"Message: {error_text}"
         )
 
+
         if (
             "429" in error_text
-            or "RESOURCE_EXHAUSTED"
-            in error_text
-            or "quota"
-            in error_text.lower()
+            or "RESOURCE_EXHAUSTED" in error_text
+            or "quota" in error_text.lower()
         ):
 
             raise RuntimeError(
                 "GEMINI_QUOTA_EXCEEDED"
             )
+
 
         raise RuntimeError(
             f"Gemini request failed: "
@@ -353,15 +310,18 @@ def generate_with_groq(
         get_groq_client()
     )
 
+
     selected_model = (
         model
         or DEFAULT_MODELS["groq"]
     )
 
+
     print(
         f"[AXEL] Groq RAG request | "
         f"model={selected_model}"
     )
+
 
     try:
 
@@ -382,6 +342,7 @@ def generate_with_groq(
             )
         )
 
+
         answer = (
             response
             .choices[0]
@@ -389,21 +350,26 @@ def generate_with_groq(
             .content
         )
 
+
         if not answer:
 
             raise RuntimeError(
                 "Groq returned an empty response."
             )
+
 
         answer = answer.strip()
 
+
         if not answer:
 
             raise RuntimeError(
                 "Groq returned an empty response."
             )
 
+
         return answer
+
 
     except Exception as e:
 
@@ -418,6 +384,7 @@ def generate_with_groq(
         print(
             f"Message: {str(e)}"
         )
+
 
         raise RuntimeError(
             f"Groq request failed: "
@@ -442,6 +409,7 @@ def ask_question(
         .strip()
     )
 
+
     # =====================================================
     # VALIDATE PROVIDER
     # =====================================================
@@ -455,6 +423,7 @@ def ask_question(
             f"Unsupported provider: {provider}"
         )
 
+
     # =====================================================
     # LOADED KNOWLEDGE SOURCES
     # =====================================================
@@ -465,18 +434,23 @@ def ask_question(
         )
     )
 
+
     print(
         "[AXEL RAG] Loaded collections:",
         loaded_collections
     )
 
-    # No RAG source loaded
+
+    # =====================================================
+    # NO RAG SOURCE LOADED
+    # =====================================================
 
     if not loaded_collections:
 
         return (
             "No Knowledge Source loaded."
         )
+
 
     # =====================================================
     # CONVERSATION HISTORY
@@ -487,24 +461,19 @@ def ask_question(
         limit=10,
     )
 
-    # =====================================================
-    # LOAD EMBEDDING MODEL
-    # =====================================================
-
-    embedding_model = (
-        get_embedding_model()
-    )
 
     # =====================================================
     # SEARCH VECTOR DATABASE
+    #
+    # No local embedding model needed.
     # =====================================================
 
     context = search_all(
         query=question,
-        model=embedding_model,
         collections=loaded_collections,
         session_id=session_id,
     )
+
 
     # =====================================================
     # NO RELEVANT CONTEXT
@@ -513,6 +482,7 @@ def ask_question(
     if not context:
 
         return "I don't know."
+
 
     # =====================================================
     # CURRENT INDIA TIME
@@ -529,6 +499,7 @@ def ask_question(
         )
     )
 
+
     # =====================================================
     # BUILD FINAL PROMPT
     # =====================================================
@@ -541,6 +512,7 @@ def ask_question(
             current_datetime=current_datetime,
         )
     )
+
 
     # =====================================================
     # GENERATE RESPONSE
@@ -557,6 +529,7 @@ def ask_question(
                 )
             )
 
+
         except RuntimeError as e:
 
             if str(e) == (
@@ -570,6 +543,7 @@ def ask_question(
                 print(
                     "[AXEL] Falling back to Groq..."
                 )
+
 
                 response = (
                     generate_with_groq(
@@ -591,6 +565,7 @@ def ask_question(
             )
         )
 
+
     # =====================================================
     # SAVE MEMORY
     # =====================================================
@@ -601,10 +576,12 @@ def ask_question(
         question,
     )
 
+
     add_message(
         session_id,
         "assistant",
         response,
     )
+
 
     return response

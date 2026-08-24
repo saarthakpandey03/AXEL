@@ -34,13 +34,17 @@ def get_collection(
 
 def create_vector_db(
     chunks,
-    model,
-    collection_name,
-    session_id
+    model=None,
+    collection_name: str = "default",
+    session_id: str = ""
 ):
 
     if not chunks:
-        print("[RAG] No chunks to store.")
+
+        print(
+            "[RAG] No chunks to store."
+        )
+
         return None
 
 
@@ -50,18 +54,15 @@ def create_vector_db(
 
 
     print(
-        f"[RAG] Creating embeddings for "
+        f"[RAG] Storing "
         f"{len(chunks)} chunks..."
     )
 
 
-    # Generate embeddings
-    embeddings = model.encode(
-        chunks
-    )
+    # =====================================================
+    # UNIQUE DOCUMENT ID
+    # =====================================================
 
-
-    # Unique document ID
     document_id = str(
         uuid.uuid4()
     )
@@ -71,7 +72,7 @@ def create_vector_db(
 
     documents = []
 
-    metadata = []
+    metadatas = []
 
 
     for i, chunk in enumerate(chunks):
@@ -84,7 +85,7 @@ def create_vector_db(
             chunk
         )
 
-        metadata.append(
+        metadatas.append(
             {
                 "document_id": document_id,
                 "session_id": session_id,
@@ -93,19 +94,19 @@ def create_vector_db(
         )
 
 
-    # Add all chunks in one request
+    # =====================================================
+    # ADD DOCUMENTS
+    #
+    # Chroma automatically creates embeddings
+    # =====================================================
+
     collection.add(
 
         ids=ids,
 
         documents=documents,
 
-        embeddings=[
-            embedding.tolist()
-            for embedding in embeddings
-        ],
-
-        metadatas=metadata
+        metadatas=metadatas
     )
 
 
@@ -123,9 +124,9 @@ def create_vector_db(
 
 def search_all(
     query: str,
-    model,
-    collections: list,
-    session_id: str,
+    model=None,
+    collections: list = None,
+    session_id: str = "",
     n_results: int = 3
 ):
 
@@ -144,14 +145,12 @@ def search_all(
     )
 
 
-    # Generate query embedding
-    query_embedding = model.encode(
-        query
-    ).tolist()
-
-
     all_context = []
 
+
+    # =====================================================
+    # SEARCH COLLECTIONS
+    # =====================================================
 
     for collection_name in collections:
 
@@ -162,10 +161,12 @@ def search_all(
             )
 
 
+            # Chroma automatically creates
+            # query embeddings
             result = collection.query(
 
-                query_embeddings=[
-                    query_embedding
+                query_texts=[
+                    query
                 ],
 
                 where={
@@ -223,6 +224,10 @@ def search_all(
             )
 
 
+    # =====================================================
+    # NO CONTEXT
+    # =====================================================
+
     if not unique_context:
 
         print(
@@ -232,10 +237,17 @@ def search_all(
         return ""
 
 
-    # Limit context to avoid huge prompt
+    # =====================================================
+    # LIMIT CONTEXT SIZE
+    # =====================================================
+
     final_context = "\n\n".join(
         unique_context
     )
+
+
+    # Prevent huge prompt
+    final_context = final_context[:12000]
 
 
     print(
