@@ -1353,7 +1353,7 @@ const ChatInput = ({
                     ================================================= */}
 
           <p className="mt-3 text-center text-xs text-slate-500">
-            AI can make mistakes. Verify important information.
+            AXEL can make mistakes. Verify important information.
           </p>
         </div>
       </div>

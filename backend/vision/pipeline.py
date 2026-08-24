@@ -8,27 +8,48 @@ def process_image(
     provider: str = "gemini",
     model: str | None = None
 ):
-    """
-    Complete Vision Pipeline
 
-    Image
-      ↓
-    Preprocess
-      ↓
-    OCR
-      ↓
-    Caption
-      ↓
-    Merge
-    """
+    print("\n========== IMAGE PIPELINE ==========")
+    print("Image path:", image_path)
+    print("Provider:", provider)
+    print("Model:", model)
+    print("====================================\n")
 
     # =====================================================
-    # Improve image for OCR
+    # CHECK FILE
     # =====================================================
 
-    processed_image = preprocess(
-        image_path
-    )
+    import os
+
+    if not os.path.exists(image_path):
+
+        raise FileNotFoundError(
+            f"Image file not found: {image_path}"
+        )
+
+
+    # =====================================================
+    # PREPROCESS
+    # =====================================================
+
+    try:
+
+        processed_image = preprocess(
+            image_path
+        )
+
+        print(
+            "Image preprocessing successful"
+        )
+
+    except Exception as e:
+
+        print(
+            f"[PREPROCESS ERROR] {type(e).__name__}: {str(e)}"
+        )
+
+        # Original image use karo if preprocessing fails
+        processed_image = image_path
 
 
     # =====================================================
@@ -41,17 +62,21 @@ def process_image(
             processed_image
         )
 
+        print(
+            f"OCR text length: {len(ocr_text or '')}"
+        )
+
     except Exception as e:
 
         print(
-            f"OCR Error: {e}"
+            f"[OCR ERROR] {type(e).__name__}: {str(e)}"
         )
 
         ocr_text = ""
 
 
     # =====================================================
-    # Vision Caption
+    # VISION CAPTION
     # =====================================================
 
     try:
@@ -62,24 +87,42 @@ def process_image(
             model=model
         )
 
+        print(
+            f"Vision caption length: {len(caption or '')}"
+        )
+
     except Exception as e:
 
         print(
-            f"Vision Error: {e}"
+            f"[VISION ERROR] {type(e).__name__}: {str(e)}"
         )
 
         caption = ""
 
 
     # =====================================================
-    # Merge OCR + Vision
+    # MERGE
     # =====================================================
 
-    final_text = f"""
-{caption}
+    final_text = "\n\n".join(
+        part.strip()
+        for part in [
+            caption or "",
+            ocr_text or ""
+        ]
+        if part and part.strip()
+    )
 
-{ocr_text}
-"""
 
+    if not final_text:
+
+        raise RuntimeError(
+            "Image processing returned no OCR text or vision description."
+        )
+
+
+    print(
+        f"Final image text length: {len(final_text)}"
+    )
 
     return final_text
