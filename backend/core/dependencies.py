@@ -1,9 +1,30 @@
 import uuid
+
 from fastapi import Header
 
-def get_session_id(x_session_id: str= Header(None))->str:
+
+# =========================================================
+# SESSION ID
+# =========================================================
+
+def get_session_id(
+    x_session_id: str | None = Header(
+        default=None,
+        alias="X-Session-ID"
+    )
+) -> str:
     """
-    Return an existing session_id 
-    or create a new one.
+    Return the session ID received from the frontend.
+
+    If no session ID is provided,
+    generate a new one.
     """
-    return x_session_id or str(uuid.uuid4())
+
+    if x_session_id:
+
+        return x_session_id.strip()
+
+
+    return str(
+        uuid.uuid4()
+    )

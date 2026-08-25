@@ -1,12 +1,16 @@
-from backend.storage.redis import redis_client
 import json
+
+from backend.storage.redis import redis_client
 
 
 # =========================================================
 # SESSION KEY
 # =========================================================
 
-def get_session_key(session_id: str):
+def get_session_key(
+    session_id: str
+) -> str:
+
     return f"session:{session_id}"
 
 
@@ -49,11 +53,13 @@ def add_loaded_collection(
         session_id
     )
 
+
     if collection not in collections:
 
         collections.append(
             collection
         )
+
 
     redis_client.hset(
         get_session_key(session_id),
@@ -64,23 +70,36 @@ def add_loaded_collection(
 
 def get_loaded_collections(
     session_id: str
-):
+) -> list:
 
     collections = redis_client.hget(
         get_session_key(session_id),
         "loaded_collections"
     )
 
+
     if not collections:
         return []
 
+
     try:
 
-        return json.loads(
+        data = json.loads(
             collections
         )
 
-    except json.JSONDecodeError:
+
+        if isinstance(data, list):
+            return data
+
+
+        return []
+
+
+    except (
+        json.JSONDecodeError,
+        TypeError
+    ):
 
         print(
             "[WARNING] Invalid loaded_collections data."
@@ -107,23 +126,36 @@ def set_history(
 
 def get_history(
     session_id: str
-):
+) -> list:
 
     history = redis_client.hget(
         get_session_key(session_id),
         "history"
     )
 
+
     if not history:
         return []
 
+
     try:
 
-        return json.loads(
+        data = json.loads(
             history
         )
 
-    except json.JSONDecodeError:
+
+        if isinstance(data, list):
+            return data
+
+
+        return []
+
+
+    except (
+        json.JSONDecodeError,
+        TypeError
+    ):
 
         print(
             "[WARNING] Invalid history data."

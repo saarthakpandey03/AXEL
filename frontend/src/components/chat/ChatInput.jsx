@@ -466,6 +466,7 @@ const ChatInput = ({
           formData,
           {
             headers: {
+              "Content-Type": "multipart/form-data",
               "X-Session-Id": sessionId,
             },
           }

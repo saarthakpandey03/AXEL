@@ -7,6 +7,11 @@ from dotenv import load_dotenv
 from google import genai
 from openai import OpenAI
 
+from backend.memory.conversation import (
+    add_message,
+    build_context
+)
+
 
 # =========================================================
 # ENVIRONMENT
@@ -77,7 +82,8 @@ If anyone asks who created you, who owns you, who is your developer, or similar 
 Current date and time:
 {current_datetime}
 
-Answer the user's question naturally and directly.
+Use the previous conversation only when it is relevant.
+If the current question is unrelated, answer it independently.
 
 IMPORTANT:
 
@@ -86,6 +92,9 @@ IMPORTANT:
 - If the user asks for today's date, use the current date above.
 - Never say that you don't have access to the current time.
 - Never write placeholders such as [current time], [date], or [time].
+
+Conversation History:
+{history}
 
 Current Question:
 {question}
@@ -134,6 +143,16 @@ def chat(
 
 
     # =====================================================
+    # CONVERSATION HISTORY
+    # =====================================================
+
+    history = build_context(
+        session_id=session_id,
+        limit=10
+    )
+
+
+    # =====================================================
     # CURRENT INDIA TIME
     # =====================================================
 
@@ -149,6 +168,7 @@ def chat(
     # =====================================================
 
     final_prompt = SYSTEM_PROMPT.format(
+        history=history,
         question=question,
         current_datetime=current_datetime
     )
@@ -309,6 +329,24 @@ def chat(
             raise RuntimeError(
                 f"Groq request failed: {str(e)}"
             )
+
+
+    # =====================================================
+    # SAVE CONVERSATION MEMORY
+    # =====================================================
+
+    add_message(
+        session_id=session_id,
+        role="user",
+        content=question
+    )
+
+
+    add_message(
+        session_id=session_id,
+        role="assistant",
+        content=answer
+    )
 
 
     # =====================================================

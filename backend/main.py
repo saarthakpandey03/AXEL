@@ -53,11 +53,8 @@ from backend.database.mongo import client
 # =========================================================
 
 app = FastAPI(
-
     title="AXEL",
-
     version="1.0.0",
-
 )
 
 
@@ -116,11 +113,8 @@ app.add_middleware(
 def home():
 
     return {
-
         "message":
-
-        "AXEL AI Assistant API Running 🚀"
-
+            "AXEL AI Assistant API Running 🚀"
     }
 
 
@@ -196,7 +190,10 @@ def message(
         )
 
 
-        if not isinstance(response, dict):
+        if not isinstance(
+            response,
+            dict
+        ):
 
             response = {
 
@@ -262,7 +259,13 @@ async def upload(
 
 ):
 
+    file_path = None
+
     try:
+
+        # =================================================
+        # CREATE UPLOAD DIRECTORY
+        # =================================================
 
         os.makedirs(
 
@@ -273,8 +276,16 @@ async def upload(
         )
 
 
+        # =================================================
+        # READ FILE
+        # =================================================
+
         content = await file.read()
 
+
+        # =================================================
+        # FILE SIZE LIMIT
+        # =================================================
 
         if len(content) > 25 * 1024 * 1024:
 
@@ -285,20 +296,24 @@ async def upload(
                 "message":
                     "File size exceeds 25 MB.",
 
+                "session_id": session_id,
+
             }
 
+
+        # =================================================
+        # GENERATE UNIQUE FILE NAME
+        # =================================================
 
         extension = os.path.splitext(
 
             file.filename or ""
 
-        )[1]
+        )[1].lower()
 
 
         filename = (
-
             f"{uuid.uuid4()}{extension}"
-
         )
 
 
@@ -311,16 +326,23 @@ async def upload(
         )
 
 
+        # =================================================
+        # SAVE FILE
+        # =================================================
+
         with open(
-
             file_path,
-
             "wb",
-
         ) as f:
 
-            f.write(content)
+            f.write(
+                content
+            )
 
+
+        # =================================================
+        # PROCESS FILE
+        # =================================================
 
         response = process_message(
 
@@ -335,7 +357,10 @@ async def upload(
         )
 
 
-        if not isinstance(response, dict):
+        if not isinstance(
+            response,
+            dict
+        ):
 
             response = {
 
@@ -382,20 +407,29 @@ async def upload(
         }
 
 
-# =========================================================
-# AUTH ROUTES
-# =========================================================
+    finally:
 
-app.include_router(
-    auth_router
-)
+        # =================================================
+        # DELETE TEMPORARY UPLOADED FILE
+        # =================================================
 
+        if file_path and os.path.exists(
+            file_path
+        ):
 
-# =========================================================
-# PAYMENT ROUTES
-# =========================================================
+            try:
 
-app.include_router(
-    payment_router
-)
+                os.remove(
+                    file_path
+                )
 
+                print(
+                    f"[UPLOAD] Temporary file deleted: "
+                    f"{file_path}"
+                )
+
+            except Exception as e:
+
+                print(
+                    f"[UPLOAD] Failed to delete file: {e}"
+                )
