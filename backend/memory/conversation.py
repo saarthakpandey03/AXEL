@@ -1,6 +1,6 @@
 from backend.core.session import (
     get_history,
-    set_history
+    set_history,
 )
 
 
@@ -8,7 +8,7 @@ from backend.core.session import (
 # ADD MESSAGE
 # =========================================================
 
-def add_message(
+async def add_message(
     session_id: str,
     role: str,
     content: str
@@ -23,18 +23,15 @@ def add_message(
     if not content:
         return
 
-
-    history = get_history(
+    history = await get_history(
         session_id
     )
-
 
     if not isinstance(
         history,
         list
     ):
         history = []
-
 
     history.append(
         {
@@ -43,12 +40,10 @@ def add_message(
         }
     )
 
-
     # Keep only last 20 messages
     history = history[-20:]
 
-
-    set_history(
+    await set_history(
         session_id,
         history
     )
@@ -58,7 +53,7 @@ def add_message(
 # CLEAR HISTORY
 # =========================================================
 
-def clear_history(
+async def clear_history(
     session_id: str
 ):
     """
@@ -68,8 +63,7 @@ def clear_history(
     if not session_id:
         return
 
-
-    set_history(
+    await set_history(
         session_id,
         []
     )
@@ -79,7 +73,7 @@ def clear_history(
 # BUILD CONTEXT
 # =========================================================
 
-def build_context(
+async def build_context(
     session_id: str,
     limit: int | None = None
 ):
@@ -90,11 +84,9 @@ def build_context(
     if not session_id:
         return ""
 
-
-    history = get_history(
+    history = await get_history(
         session_id
     )
-
 
     if not isinstance(
         history,
@@ -102,14 +94,11 @@ def build_context(
     ):
         return ""
 
-
     if limit is not None and limit > 0:
 
         history = history[-limit:]
 
-
     context_parts = []
-
 
     for message in history:
 
@@ -118,7 +107,6 @@ def build_context(
             dict
         ):
             continue
-
 
         role = message.get(
             "role",
@@ -130,15 +118,12 @@ def build_context(
             ""
         )
 
-
         if not content:
             continue
-
 
         context_parts.append(
             f"{role.capitalize()}: {content}"
         )
-
 
     return "\n".join(
         context_parts

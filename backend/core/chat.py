@@ -107,7 +107,7 @@ Answer:
 # CHAT
 # =========================================================
 
-def chat(
+async def chat(
     session_id: str,
     question: str,
     provider: str = "gemini",
@@ -146,7 +146,7 @@ def chat(
     # CONVERSATION HISTORY
     # =====================================================
 
-    history = build_context(
+    history = await build_context(
         session_id=session_id,
         limit=10
     )
@@ -335,14 +335,14 @@ def chat(
     # SAVE CONVERSATION MEMORY
     # =====================================================
 
-    add_message(
+    await add_message(
         session_id=session_id,
         role="user",
         content=question
     )
 
 
-    add_message(
+    await add_message(
         session_id=session_id,
         role="assistant",
         content=answer

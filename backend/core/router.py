@@ -2,7 +2,7 @@ from backend.core.classifier import detect_input_type
 from backend.core.chat import chat
 
 
-def process_message(
+async def process_message(
     session_id: str,
     message: str,
     provider: str = "gemini",
@@ -92,7 +92,7 @@ def process_message(
 
     elif input_type == "chat":
 
-        answer = chat(
+        answer = await chat(
 
             session_id=session_id,
 

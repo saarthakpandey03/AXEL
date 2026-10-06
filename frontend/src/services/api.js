@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://axel-a7ya.onrender.com",
-    // baseURL: "http://127.0.0.1:8000",
+    baseURL: import.meta.env.VITE_API_URL || "http://127.0.0.1:8000",
+
     headers: {
         "Content-Type": "application/json",
     },
@@ -10,7 +10,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        // Auth endpoints ke alawa token bhejo
         const isAuthRequest = config.url?.startsWith("/auth/");
 
         if (!isAuthRequest) {
@@ -21,7 +20,6 @@ api.interceptors.request.use(
             }
         }
 
-        // File upload ke time browser khud multipart boundary set karega
         if (config.data instanceof FormData) {
             delete config.headers["Content-Type"];
         } else {

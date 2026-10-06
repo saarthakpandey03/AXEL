@@ -1,5 +1,5 @@
-from backend.vision.preprocess import preprocess
-from backend.vision.ocr import extract_text
+import os
+
 from backend.vision.caption import generate_caption
 
 
@@ -10,119 +10,144 @@ def process_image(
 ):
 
     print("\n========== IMAGE PIPELINE ==========")
-    print("Image path:", image_path)
-    print("Provider:", provider)
-    print("Model:", model)
-    print("====================================\n")
+
+    print(
+        "Image path:",
+        image_path
+    )
+
+    print(
+        "Provider:",
+        provider
+    )
+
+    print(
+        "Model:",
+        model
+    )
+
+    print(
+        "====================================\n"
+    )
+
 
     # =====================================================
     # CHECK FILE
     # =====================================================
 
-    import os
-
-    if not os.path.exists(image_path):
+    if not os.path.exists(
+        image_path
+    ):
 
         raise FileNotFoundError(
-            f"Image file not found: {image_path}"
+
+            f"Image file not found: "
+            f"{image_path}"
+
         )
+
+
+    print(
+        "[IMAGE] File found successfully"
+    )
 
 
     # =====================================================
-    # PREPROCESS
+    # VISION ANALYSIS
     # =====================================================
 
-    try:
+    print(
+        "[VISION] Starting image analysis..."
+    )
 
-        processed_image = preprocess(
-            image_path
-        )
-
-        print(
-            "Image preprocessing successful"
-        )
-
-    except Exception as e:
-
-        print(
-            f"[PREPROCESS ERROR] {type(e).__name__}: {str(e)}"
-        )
-
-        # Original image use karo if preprocessing fails
-        processed_image = image_path
-
-
-    # =====================================================
-    # OCR
-    # =====================================================
-
-    try:
-
-        ocr_text = extract_text(
-            processed_image
-        )
-
-        print(
-            f"OCR text length: {len(ocr_text or '')}"
-        )
-
-    except Exception as e:
-
-        print(
-            f"[OCR ERROR] {type(e).__name__}: {str(e)}"
-        )
-
-        ocr_text = ""
-
-
-    # =====================================================
-    # VISION CAPTION
-    # =====================================================
 
     try:
 
         caption = generate_caption(
+
             image_path=image_path,
+
             provider=provider,
+
             model=model
+
         )
 
+
         print(
-            f"Vision caption length: {len(caption or '')}"
+
+            "[VISION] Analysis completed"
+
         )
+
+
+        print(
+
+            f"[VISION] Response length: "
+            f"{len(caption or '')}"
+
+        )
+
 
     except Exception as e:
 
         print(
-            f"[VISION ERROR] {type(e).__name__}: {str(e)}"
+
+            f"[VISION ERROR] "
+            f"{type(e).__name__}: "
+            f"{str(e)}"
+
         )
+
 
         caption = ""
 
 
     # =====================================================
-    # MERGE
+    # PROCESS RESPONSE
     # =====================================================
 
-    final_text = "\n\n".join(
-        part.strip()
-        for part in [
-            caption or "",
-            ocr_text or ""
-        ]
-        if part and part.strip()
+    print(
+        "[IMAGE] Processing vision response..."
     )
 
+
+    final_text = (
+
+        caption or ""
+
+    ).strip()
+
+
+    # =====================================================
+    # VALIDATE RESPONSE
+    # =====================================================
 
     if not final_text:
 
         raise RuntimeError(
-            "Image processing returned no OCR text or vision description."
+
+            "Image processing returned "
+            "no description."
+
         )
 
 
+    # =====================================================
+    # FINAL RESULT
+    # =====================================================
+
     print(
-        f"Final image text length: {len(final_text)}"
+
+        f"[IMAGE] Final text length: "
+        f"{len(final_text)}"
+
     )
+
+
+    print(
+        "[IMAGE] Processing completed successfully ✅"
+    )
+
 
     return final_text

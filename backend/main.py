@@ -59,6 +59,19 @@ app = FastAPI(
 
 
 # =========================================================
+# ROUTERS
+# =========================================================
+
+# Auth router already has prefix="/auth"
+app.include_router(auth_router)
+
+# Payment router
+# Keep this without an extra prefix for now.
+# We will check payment/router.py separately.
+app.include_router(payment_router)
+
+
+# =========================================================
 # STARTUP
 # =========================================================
 
@@ -89,8 +102,6 @@ app.add_middleware(
     allow_origins=[
 
         "http://localhost:5173",
-
-        "http://127.0.0.1:5173",
 
         "https://axel-henna.vercel.app",
 
@@ -136,7 +147,7 @@ def health_check():
 # =========================================================
 
 @app.post("/message")
-def message(
+async def message(
 
     data: MessageRequest,
 
@@ -177,7 +188,7 @@ def message(
         )
 
 
-        response = process_message(
+        response = await process_message(
 
             session_id=session_id,
 
@@ -344,7 +355,7 @@ async def upload(
         # PROCESS FILE
         # =================================================
 
-        response = process_message(
+        response = await process_message(
 
             session_id=session_id,
 
